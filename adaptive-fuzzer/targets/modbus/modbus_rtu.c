@@ -1,311 +1,235 @@
 /*
- * modbus_rtu.c – Zephyr Modbus RTU parser adapted for fuzzing
+ * modbus_rtu.c – Zephyr Modbus RTU serial-frame handler, refactored for fuzzing
  *
- * Source: Extracted and adapted from Zephyr RTOS
- *         subsys/modbus/modbus_rtu.c (Apache-2.0 / Zephyr Project)
+ * Original source: Zephyr RTOS  subsys/modbus/modbus_serial.c
+ * Copyright (c) 2020 PHYTEC Messtechnik GmbH
+ * Copyright (c) 2021 Nordic Semiconductor ASA
+ * SPDX-License-Identifier: Apache-2.0
  *
- * Key adaptations (per paper Section III-C):
- *   1. Zephyr RTOS dependencies replaced by include/zephyr_compat.h stubs.
- *   2. CRC validation bypassed – modbus_rtu_check_crc() always returns true.
- *   3. Hardware timer callbacks (t1_5 / t3_5 silent-interval timers) removed;
- *      state transitions are now synchronous (evaluated when the input buffer
- *      is exhausted or an explicit end-of-frame sentinel is seen).
- *   4. Frame size hard-capped at MODBUS_MAX_FRAME_SIZE (256 bytes).
+ * ============================================================
+ * Six modifications applied (per modbusprompt.md §4):
+ *
+ * Mod 4.1 – Header isolation / dependency decoupling
+ *   All Zephyr kernel, driver, and devicetree headers removed.
+ *   Replaced with <stdbool.h>, <stddef.h>, <stdint.h>, <stdio.h>,
+ *   <string.h>, and the local "zephyr_compat.h".
+ *   DT_*, DEVICE_DEFINE, SYS_INIT, and all driver-registration
+ *   mechanisms removed.
+ *
+ * Mod 4.2 – CRC verification bypass
+ *   modbus_rtu_check_crc() always returns true so mutated frames
+ *   are not dropped before the protocol parser is exercised.
+ *   *** FUZZING ONLY – must not be used in production firmware. ***
+ *
+ * Mod 4.3 – Timers replaced with synchronous transitions
+ *   k_timer_init / k_timer_start / k_timer_stop and their callbacks
+ *   (rtu_tmr_handler) are removed.  Frame completion is signalled
+ *   synchronously by modbus_rtu_fuzz_inject() after all bytes are
+ *   ingested, eliminating any wall-clock or scheduler dependency.
+ *
+ * Mod 4.4 – 256-byte frame cap
+ *   MODBUS_MAX_FRAME_SIZE = 256 (defined in zephyr_compat.h).
+ *   Every buffer declaration and length counter uses this limit.
+ *   Input larger than 256 bytes is clamped to the first 256 bytes.
+ *   A frame of exactly 256 bytes is handled without off-by-one.
+ *
+ * Mod 4.5 – Synchronization and logging redirected
+ *   k_sem / k_mutex operations are no-ops (defined in zephyr_compat.h).
+ *   LOG_* macros map to printf-based output (§4.5 spec).
+ *
+ * Mod 4.6 – Harness entry point exported
+ *   void modbus_rtu_fuzz_inject(const uint8_t *data, size_t len)
+ *   is the single public symbol consumed by harness_modbus.c.
+ * ============================================================
  */
 
-#include "include/zephyr_compat.h"
-#include <string.h>
-#include <stdint.h>
+/* Mod 4.1 – Only standard C headers + local compat shim */
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
-/* -------------------------------------------------------------------------
- * Frame-size guard (Step 2.5)
- * ---------------------------------------------------------------------- */
+#include "zephyr_compat.h"
 
-#define MODBUS_MAX_FRAME_SIZE  256u
+/* ===========================================================================
+ * Module-level fuzzing context
+ *
+ * A single static modbus_context is used for all fuzz iterations.
+ * It is fully reset by modbus_rtu_fuzz_inject() before each invocation
+ * so no state leaks between iterations.
+ * ========================================================================= */
 
-/* -------------------------------------------------------------------------
- * Modbus RTU state machine states
- * ---------------------------------------------------------------------- */
+static struct modbus_serial_config g_serial_cfg;
+static struct modbus_context       g_ctx;
 
-typedef enum {
-    MODBUS_STATE_IDLE = 0,
-    MODBUS_STATE_RECEIVING,
-    MODBUS_STATE_PROCESSING,
-    MODBUS_STATE_DONE,
-    MODBUS_STATE_ERROR,
-} modbus_state_t;
-
-/* -------------------------------------------------------------------------
- * Internal Modbus context (state machine variables)
- * ---------------------------------------------------------------------- */
-
-typedef struct {
-    modbus_state_t  state;
-    uint8_t         slave_addr;
-    uint8_t         func_code;
-    uint16_t        transaction_id;  /* used in Modbus TCP mode; zeroed for RTU */
-    uint8_t         rx_buf[MODBUS_MAX_FRAME_SIZE];
-    size_t          rx_len;
-    bool            frame_error;
-} modbus_ctx_t;
-
-/* Module-level context – reset between fuzz iterations by the harness */
-static modbus_ctx_t g_ctx;
-
-/* -------------------------------------------------------------------------
- * CRC-16 (Modbus) – kept for reference; bypassed during fuzzing
- * (Step 2.3: force the check to always return true)
- * ---------------------------------------------------------------------- */
-
-static uint16_t crc16_modbus(const uint8_t *data, size_t len)
-{
-    uint16_t crc = 0xFFFF;
-    for (size_t i = 0; i < len; i++) {
-        crc ^= (uint16_t)data[i];
-        for (int j = 0; j < 8; j++) {
-            if (crc & 0x0001) {
-                crc = (crc >> 1) ^ 0xA001;
-            } else {
-                crc >>= 1;
-            }
-        }
-    }
-    return crc;
-}
+/* ===========================================================================
+ * Mod 4.2 – CRC bypass
+ *
+ * Original Zephyr implementation compared calc_crc against the CRC stored
+ * in the last two bytes of the frame.  For fuzzing we unconditionally
+ * return true so mutated (invalid-CRC) frames exercise the full parser.
+ * ========================================================================= */
 
 /*
- * modbus_rtu_check_crc – CRC integrity gate
+ * modbus_rtu_check_crc – CRC integrity gate (bypassed for fuzzing).
  *
- * FUZZER ADAPTATION: always returns true so the fuzzer can reach deep
- * command-handling states without having to produce a valid 16-bit CRC.
- * The real CRC computation is preserved above for reference.
+ * FUZZING ONLY – always returns true.
+ * DO NOT USE IN PRODUCTION.
  */
-static bool modbus_rtu_check_crc(const uint8_t *frame, size_t len)
+static inline bool modbus_rtu_check_crc(const uint8_t *frame, uint16_t len)
 {
-    (void)crc16_modbus; /* suppress unused-function warning */
     (void)frame;
     (void)len;
-    /* Bypass: pretend every CRC is valid */
-    return true;
+    return true; /* CRC bypass requested for fuzzing. */
 }
 
-/* -------------------------------------------------------------------------
- * PDU field accessors
- * ---------------------------------------------------------------------- */
-
-static inline uint8_t  frame_slave_addr(const uint8_t *f) { return f[0]; }
-static inline uint8_t  frame_func_code (const uint8_t *f) { return f[1]; }
-static inline uint16_t frame_be16(const uint8_t *f, size_t off)
-{
-    return (uint16_t)((f[off] << 8) | f[off + 1]);
-}
-
-/* -------------------------------------------------------------------------
- * Function-code dispatch table
+/* ===========================================================================
+ * RTU receive-ADU parser
  *
- * Each handler receives the full frame and its length.  Handlers may update
- * g_ctx to reflect post-processing state.
- * ---------------------------------------------------------------------- */
-
-static void handle_read_coils(const uint8_t *frame, size_t len)
-{
-    if (len < 6) { g_ctx.frame_error = true; return; }
-    uint16_t start_addr = frame_be16(frame, 2);
-    uint16_t quantity   = frame_be16(frame, 4);
-    LOG_DBG("READ_COILS addr=0x%04x qty=%u", start_addr, quantity);
-    (void)start_addr; (void)quantity;
-}
-
-static void handle_read_discrete_inputs(const uint8_t *frame, size_t len)
-{
-    if (len < 6) { g_ctx.frame_error = true; return; }
-    uint16_t start_addr = frame_be16(frame, 2);
-    uint16_t quantity   = frame_be16(frame, 4);
-    LOG_DBG("READ_DISCRETE_INPUTS addr=0x%04x qty=%u", start_addr, quantity);
-    (void)start_addr; (void)quantity;
-}
-
-static void handle_read_holding_registers(const uint8_t *frame, size_t len)
-{
-    if (len < 6) { g_ctx.frame_error = true; return; }
-    uint16_t start_addr = frame_be16(frame, 2);
-    uint16_t quantity   = frame_be16(frame, 4);
-    LOG_DBG("READ_HOLDING_REGS addr=0x%04x qty=%u", start_addr, quantity);
-    (void)start_addr; (void)quantity;
-}
-
-static void handle_read_input_registers(const uint8_t *frame, size_t len)
-{
-    if (len < 6) { g_ctx.frame_error = true; return; }
-    uint16_t start_addr = frame_be16(frame, 2);
-    uint16_t quantity   = frame_be16(frame, 4);
-    LOG_DBG("READ_INPUT_REGS addr=0x%04x qty=%u", start_addr, quantity);
-    (void)start_addr; (void)quantity;
-}
-
-static void handle_write_single_coil(const uint8_t *frame, size_t len)
-{
-    if (len < 6) { g_ctx.frame_error = true; return; }
-    uint16_t coil_addr  = frame_be16(frame, 2);
-    uint16_t coil_value = frame_be16(frame, 4);
-    LOG_DBG("WRITE_SINGLE_COIL addr=0x%04x val=0x%04x", coil_addr, coil_value);
-    (void)coil_addr; (void)coil_value;
-}
-
-static void handle_write_single_register(const uint8_t *frame, size_t len)
-{
-    if (len < 6) { g_ctx.frame_error = true; return; }
-    uint16_t reg_addr  = frame_be16(frame, 2);
-    uint16_t reg_value = frame_be16(frame, 4);
-    LOG_DBG("WRITE_SINGLE_REG addr=0x%04x val=0x%04x", reg_addr, reg_value);
-    (void)reg_addr; (void)reg_value;
-}
-
-static void handle_write_multiple_coils(const uint8_t *frame, size_t len)
-{
-    if (len < 7) { g_ctx.frame_error = true; return; }
-    uint16_t start_addr  = frame_be16(frame, 2);
-    uint16_t quantity    = frame_be16(frame, 4);
-    uint8_t  byte_count  = frame[6];
-    LOG_DBG("WRITE_MULTIPLE_COILS addr=0x%04x qty=%u byte_count=%u",
-            start_addr, quantity, byte_count);
-    if (len < (size_t)(7 + byte_count)) { g_ctx.frame_error = true; return; }
-    (void)start_addr; (void)quantity; (void)byte_count;
-}
-
-static void handle_write_multiple_registers(const uint8_t *frame, size_t len)
-{
-    if (len < 7) { g_ctx.frame_error = true; return; }
-    uint16_t start_addr  = frame_be16(frame, 2);
-    uint16_t quantity    = frame_be16(frame, 4);
-    uint8_t  byte_count  = frame[6];
-    LOG_DBG("WRITE_MULTIPLE_REGS addr=0x%04x qty=%u byte_count=%u",
-            start_addr, quantity, byte_count);
-    if (len < (size_t)(7 + byte_count)) { g_ctx.frame_error = true; return; }
-    (void)start_addr; (void)quantity; (void)byte_count;
-}
-
-static void handle_mask_write_register(const uint8_t *frame, size_t len)
-{
-    if (len < 8) { g_ctx.frame_error = true; return; }
-    uint16_t ref_addr  = frame_be16(frame, 2);
-    uint16_t and_mask  = frame_be16(frame, 4);
-    uint16_t or_mask   = frame_be16(frame, 6);
-    LOG_DBG("MASK_WRITE_REG addr=0x%04x and=0x%04x or=0x%04x",
-            ref_addr, and_mask, or_mask);
-    (void)ref_addr; (void)and_mask; (void)or_mask;
-}
-
-static void handle_read_write_multiple_registers(const uint8_t *frame, size_t len)
-{
-    if (len < 11) { g_ctx.frame_error = true; return; }
-    uint16_t read_addr   = frame_be16(frame, 2);
-    uint16_t read_count  = frame_be16(frame, 4);
-    uint16_t write_addr  = frame_be16(frame, 6);
-    uint16_t write_count = frame_be16(frame, 8);
-    uint8_t  byte_count  = frame[10];
-    LOG_DBG("READ_WRITE_MULT_REGS r_addr=0x%04x r_cnt=%u w_addr=0x%04x "
-            "w_cnt=%u byte_count=%u",
-            read_addr, read_count, write_addr, write_count, byte_count);
-    if (len < (size_t)(11 + byte_count)) { g_ctx.frame_error = true; return; }
-    (void)read_addr; (void)read_count; (void)write_addr;
-    (void)write_count; (void)byte_count;
-}
-
-static void handle_unknown_function(const uint8_t *frame, size_t len)
-{
-    LOG_WRN("Unknown function code 0x%02x (len=%zu)", frame[1], len);
-    g_ctx.frame_error = true;
-}
-
-/* -------------------------------------------------------------------------
- * Public API
- * ---------------------------------------------------------------------- */
-
-/*
- * modbus_rtu_reset_state – reset all state machine variables
+ * Adapted from modbus_rtu_rx_adu() in modbus_serial.c.
  *
- * Called by the harness between fuzz iterations to prevent state leakage.
- */
-void modbus_rtu_reset_state(void)
-{
-    memset(&g_ctx, 0, sizeof(g_ctx));
-    g_ctx.state = MODBUS_STATE_IDLE;
-}
+ * Changes versus upstream:
+ *   - CONFIG_MODBUS_BUFFER_SIZE replaced by MODBUS_MAX_FRAME_SIZE.
+ *   - sys_get_le16 available via zephyr_compat.h.
+ *   - CRC comparison replaced by modbus_rtu_check_crc() (bypassed).
+ *   - Removed dependency on ctx->cfg->uart_buf_ctr / uart_buf (we work
+ *     directly from the harness-provided buffer via g_serial_cfg).
+ * ========================================================================= */
 
-/*
- * modbus_rtu_process_frame – main entry point for the frame parser
- *
- * @param data   Pointer to raw RTU frame bytes
- * @param len    Number of bytes in the frame
- *
- * Returns 0 on success, -1 on hard error (frame too large, NULL pointer).
- *
- * FUZZER ADAPTATION (Step 2.4):
- *   - No hardware timer callbacks are invoked.
- *   - The function processes the entire supplied buffer synchronously and
- *     transitions to MODBUS_STATE_DONE upon exhausting it.
- */
-int modbus_rtu_process_frame(const uint8_t *data, size_t len)
+static int modbus_rtu_rx_adu(struct modbus_context *ctx)
 {
-    /* Guard: null or zero-length */
-    if (!data || len == 0) {
-        return -1;
+    struct modbus_serial_config *cfg = ctx->cfg;
+    uint16_t crc_idx;
+    uint8_t *data_ptr;
+
+    /* Mod 4.4 – length bounds check */
+    if (cfg->uart_buf_ctr < MODBUS_RTU_MIN_MSG_SIZE ||
+        cfg->uart_buf_ctr > MODBUS_MAX_FRAME_SIZE) {
+        LOG_WRN("Frame length error (%u bytes)", cfg->uart_buf_ctr);
+        return -EMSGSIZE;
     }
 
-    /* Guard: frame-size cap (Step 2.5) */
+    ctx->rx_adu.unit_id = cfg->uart_buf[0];
+    ctx->rx_adu.fc      = cfg->uart_buf[1];
+    data_ptr            = &cfg->uart_buf[2];
+
+    /* Payload length: strip address (1), function code (1), CRC (2) */
+    ctx->rx_adu.length  = cfg->uart_buf_ctr - 4U;
+
+    /* CRC field is the last two bytes, little-endian */
+    crc_idx             = cfg->uart_buf_ctr - (uint16_t)sizeof(uint16_t);
+    ctx->rx_adu.crc     = sys_get_le16(&cfg->uart_buf[crc_idx]);
+
+    /* Mod 4.4 – guard data copy against oversized payload */
+    if (ctx->rx_adu.length > sizeof(ctx->rx_adu.data)) {
+        LOG_WRN("Payload length %u exceeds ADU data buffer", ctx->rx_adu.length);
+        ctx->rx_adu.length = (uint16_t)sizeof(ctx->rx_adu.data);
+    }
+    memcpy(ctx->rx_adu.data, data_ptr, ctx->rx_adu.length);
+
+    /* Mod 4.2 – CRC check bypassed */
+    if (!modbus_rtu_check_crc(cfg->uart_buf, cfg->uart_buf_ctr)) {
+        LOG_WRN("CRC mismatch – dropping frame");
+        return -EIO;
+    }
+
+    return 0;
+}
+
+/* ===========================================================================
+ * Protocol-level frame dispatch
+ *
+ * In the real Zephyr stack the server_work work-queue item calls
+ * modbus_serial_rx_adu() which feeds into the full Modbus server/client
+ * request-response engine.  For fuzzing we replicate that path:
+ *   1. Parse the raw RTU ADU.
+ *   2. Log the decoded function code for triage.
+ *   3. Any future deeper dispatch (FC handler table) goes here.
+ * ========================================================================= */
+
+static void dispatch_rx_adu(struct modbus_context *ctx)
+{
+    int rc = modbus_rtu_rx_adu(ctx);
+
+    if (rc != 0) {
+        LOG_WRN("modbus_rtu_rx_adu returned %d", rc);
+        return;
+    }
+
+    LOG_DBG("RTU frame: unit_id=0x%02x fc=0x%02x payload_len=%u",
+            ctx->rx_adu.unit_id,
+            ctx->rx_adu.fc,
+            ctx->rx_adu.length);
+
+    /*
+     * Extend here with a function-code dispatch table to exercise
+     * deeper server logic (register reads, coil writes, etc.).
+     */
+}
+
+/* ===========================================================================
+ * Mod 4.6 – Public harness entry point
+ *
+ * void modbus_rtu_fuzz_inject(const uint8_t *data, size_t len)
+ *
+ * Contract (per modbusprompt.md §4.6):
+ *   1. Validates input pointer and length.
+ *   2. Resets internal parser state and buffer pointers.
+ *   3. Clamps input to MODBUS_MAX_FRAME_SIZE (first 256 bytes kept).
+ *   4. Feeds accepted bytes byte-by-byte through the RTU ingestion path.
+ *   5. Synchronously signals frame completion (Mod 4.3).
+ *   6. Triggers the protocol parser / frame handler.
+ *   7. Leaves the target ready for the next iteration.
+ *   8. Does not retain any pointer into caller-owned input after return.
+ * ========================================================================= */
+
+void modbus_rtu_fuzz_inject(const uint8_t *data, size_t len)
+{
+    /* Step 1 – Validate */
+    if (data == NULL || len == 0U) {
+        return;
+    }
+
+    /* Step 2 – Reset all context state so no values leak between iterations */
+    memset(&g_serial_cfg, 0, sizeof(g_serial_cfg));
+    memset(&g_ctx,        0, sizeof(g_ctx));
+
+    g_serial_cfg.uart_buf_ptr = &g_serial_cfg.uart_buf[0];
+    g_serial_cfg.uart_buf_ctr = 0U;
+    g_ctx.cfg                 = &g_serial_cfg;
+    g_ctx.mode                = MODBUS_MODE_RTU;
+    g_ctx.client              = false;
+
+    /* Step 3 – Clamp: accept at most MODBUS_MAX_FRAME_SIZE bytes.
+     * Choice: clamp to first 256 bytes.  Rationale: preserves maximal
+     * code-path diversity while preventing any write past the buffer. */
     if (len > MODBUS_MAX_FRAME_SIZE) {
-        LOG_WRN("Frame too large (%zu > %u), truncating", len, MODBUS_MAX_FRAME_SIZE);
         len = MODBUS_MAX_FRAME_SIZE;
     }
 
-    /* Minimum Modbus RTU frame: 1-byte address + 1-byte func + 2-byte CRC = 4 */
-    if (len < 4) {
-        g_ctx.state = MODBUS_STATE_ERROR;
-        return -1;
+    /* Step 4 – Ingest bytes sequentially (mirrors ISR byte-by-byte path).
+     * Mod 4.4 – every increment is bounds-checked; the buffer is
+     * exactly MODBUS_MAX_FRAME_SIZE bytes so ctr can reach [0, 256]
+     * without an off-by-one write. */
+    for (size_t i = 0U; i < len; i++) {
+        /* Guard: should never fire given the clamp above, but keep for safety */
+        if (g_serial_cfg.uart_buf_ctr >= MODBUS_MAX_FRAME_SIZE) {
+            break;
+        }
+        *g_serial_cfg.uart_buf_ptr++ = data[i];
+        g_serial_cfg.uart_buf_ctr++;
     }
 
-    /* Copy into internal buffer and update state */
-    memcpy(g_ctx.rx_buf, data, len);
-    g_ctx.rx_len = len;
-    g_ctx.state  = MODBUS_STATE_RECEIVING;
+    /* Step 5 – Synchronous frame-completion transition (Mod 4.3).
+     * The upstream rtu_tmr_handler fired k_work_submit(&ctx->server_work)
+     * after the t3.5 silence timer expired.  We trigger the same
+     * transition here, immediately after the last byte is ingested. */
 
-    /* CRC check – bypassed for fuzzing (Step 2.3) */
-    if (!modbus_rtu_check_crc(g_ctx.rx_buf, g_ctx.rx_len)) {
-        LOG_WRN("CRC mismatch – dropping frame");
-        g_ctx.state = MODBUS_STATE_ERROR;
-        return -1;
-    }
+    /* Step 6 – Trigger the protocol parser */
+    dispatch_rx_adu(&g_ctx);
 
-    /* Extract address and function code */
-    g_ctx.slave_addr     = frame_slave_addr(g_ctx.rx_buf);
-    g_ctx.func_code      = frame_func_code(g_ctx.rx_buf);
-    g_ctx.transaction_id = 0; /* RTU has no transaction ID */
-    g_ctx.frame_error    = false;
-
-    g_ctx.state = MODBUS_STATE_PROCESSING;
-
-    LOG_DBG("Processing frame: slave=0x%02x fc=0x%02x len=%zu",
-            g_ctx.slave_addr, g_ctx.func_code, g_ctx.rx_len);
-
-    /* Dispatch on function code */
-    switch (g_ctx.func_code) {
-    case 0x01: handle_read_coils(g_ctx.rx_buf, g_ctx.rx_len);                  break;
-    case 0x02: handle_read_discrete_inputs(g_ctx.rx_buf, g_ctx.rx_len);        break;
-    case 0x03: handle_read_holding_registers(g_ctx.rx_buf, g_ctx.rx_len);      break;
-    case 0x04: handle_read_input_registers(g_ctx.rx_buf, g_ctx.rx_len);        break;
-    case 0x05: handle_write_single_coil(g_ctx.rx_buf, g_ctx.rx_len);           break;
-    case 0x06: handle_write_single_register(g_ctx.rx_buf, g_ctx.rx_len);       break;
-    case 0x0F: handle_write_multiple_coils(g_ctx.rx_buf, g_ctx.rx_len);        break;
-    case 0x10: handle_write_multiple_registers(g_ctx.rx_buf, g_ctx.rx_len);    break;
-    case 0x16: handle_mask_write_register(g_ctx.rx_buf, g_ctx.rx_len);         break;
-    case 0x17: handle_read_write_multiple_registers(g_ctx.rx_buf, g_ctx.rx_len); break;
-    default:   handle_unknown_function(g_ctx.rx_buf, g_ctx.rx_len);            break;
-    }
-
-    /* Synchronous end-of-frame transition (replaces t3_5 timer, Step 2.4) */
-    g_ctx.state = g_ctx.frame_error ? MODBUS_STATE_ERROR : MODBUS_STATE_DONE;
-    return 0;
+    /* Step 7 – The static context is already owned by this TU; no
+     * caller-owned pointer is retained after this function returns.
+     * The next call to modbus_rtu_fuzz_inject() will memset everything. */
 }

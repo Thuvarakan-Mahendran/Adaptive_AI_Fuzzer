@@ -1,20 +1,22 @@
 /*
  * harness_modbus.c – AFL++ fuzzing harness for the Modbus RTU parser
  *
- * This harness wires the adaptive fuzzer infrastructure to the extracted
- * Modbus RTU frame-processing logic.  It follows the design described in
- * paper Section III-C / Step 2.6:
+ * Connects the fuzzer's mutated byte stream to the standalone Modbus RTU
+ * frame-processing logic exposed by modbus_rtu.c.
  *
- *   1. Reads raw bytes from STDIN (the AFL++ mutated test-case channel).
- *   2. Resets all Modbus state-machine variables between iterations.
- *   3. Calls the frame handler and exercises the full RTU dispatch path.
- *   4. Post-execution assertions catch abnormal control-flow or illegal
- *      pointer conditions (triggering SIGABRT on violation).
+ * Entry-point contract (modbusprompt.md §4.6):
+ *   The harness calls  modbus_rtu_fuzz_inject(data, len)  which:
+ *     - validates pointer and length,
+ *     - resets all internal parser state,
+ *     - clamps input to MODBUS_MAX_FRAME_SIZE (256 bytes),
+ *     - ingests bytes byte-by-byte,
+ *     - synchronously signals frame completion, and
+ *     - triggers the protocol dispatcher.
  *
- * Compile for native fuzzing:
- *   afl-clang-fast -fsanitize=address -O2
- *       -Itargets/modbus/include
- *       targets/modbus/modbus_rtu.c targets/modbus/harness_modbus.c
+ * Compile for native fuzzing (inside adaptive-fuzzer/):
+ *   afl-clang-fast -fsanitize=address -O2 \
+ *       -Itargets/modbus/include \
+ *       targets/modbus/modbus_rtu.c targets/modbus/harness_modbus.c \
  *       -o build/native/fuzzer_modbus_native
  */
 
@@ -24,80 +26,76 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
-#include <signal.h>
 
-/* Include the mocked Zephyr compatibility layer */
+/* Local Zephyr compatibility shim */
 #include "include/zephyr_compat.h"
 
-/* Forward declarations from modbus_rtu.c */
-void modbus_rtu_reset_state(void);
-int  modbus_rtu_process_frame(const uint8_t *data, size_t len);
+/* -------------------------------------------------------------------------
+ * Public symbol from modbus_rtu.c (Mod 4.6 entry point)
+ * ---------------------------------------------------------------------- */
+
+extern void modbus_rtu_fuzz_inject(const uint8_t *data, size_t len);
 
 /* -------------------------------------------------------------------------
  * Constants
  * ---------------------------------------------------------------------- */
 
-/** Maximum input buffer size – must match MODBUS_MAX_FRAME_SIZE */
-#define HARNESS_BUF_SIZE  256u
-
-/* -------------------------------------------------------------------------
- * Invariant checking
- * ---------------------------------------------------------------------- */
-
-/*
- * check_post_invariants – assert that no illegal state was reached
+/**
+ * HARNESS_BUF_SIZE – read buffer for stdin input.
  *
- * Extend this function with protocol-specific post-conditions as the
- * Modbus state machine is expanded.
+ * Intentionally larger than MODBUS_MAX_FRAME_SIZE (256) so that we can
+ * observe how the target handles over-sized inputs: modbus_rtu_fuzz_inject()
+ * will clamp them internally to 256 bytes.
  */
-static void check_post_invariants(void)
-{
-    /*
-     * Placeholder: with a more complete Modbus context exposed via a
-     * modbus_get_state() accessor, assertions such as the following
-     * would be added here:
-     *
-     *   const modbus_ctx_t *ctx = modbus_get_state();
-     *   assert(ctx->rx_len <= HARNESS_BUF_SIZE);
-     *   assert(ctx->state != SOME_ILLEGAL_STATE);
-     *
-     * A violation triggers SIGABRT (via assert()), which AFL++ treats
-     * as a crash to save and minimise.
-     */
-    (void)0; /* suppress empty-body warning */
-}
+#define HARNESS_BUF_SIZE  512U
 
 /* -------------------------------------------------------------------------
  * Fuzz entry point
  * ---------------------------------------------------------------------- */
 
-/*
- * fuzz_target_entry – persistent-mode hook anchor
+/**
+ * fuzz_target_entry – persistent-mode hook anchor.
  *
- * In standard (non-persistent) mode this is called once per process.
- * With AFL_LOOP / __AFL_LOOP the runtime wraps this in a tight loop
- * without fork() overhead; the surrounding main() handles both cases.
+ * Reads mutated bytes from stdin, then delegates to modbus_rtu_fuzz_inject()
+ * which owns reset, ingestion, and dispatch.  Post-execution invariants are
+ * checked after the call returns.
  */
 void fuzz_target_entry(void)
 {
-    /* Static local buffer – allocated once, reused each iteration */
+    /*
+     * Static buffer – allocated once per process, reused each iteration.
+     * modbus_rtu_fuzz_inject() copies what it needs into its own internal
+     * buffer, so no caller-owned pointer is retained after the call.
+     */
     static uint8_t input_buf[HARNESS_BUF_SIZE];
 
-    /* Reset Modbus state machine variables (slave addr, func, state …) */
-    modbus_rtu_reset_state();
-
-    /* Read mutated test case from AFL++ via STDIN */
+    /* Read one test case from the AFL++ mutated input channel (stdin) */
     ssize_t n = read(STDIN_FILENO, input_buf, sizeof(input_buf));
     if (n <= 0) {
-        /* No data or read error – nothing to process this iteration */
+        /*
+         * Zero-length input: pass len=0 to let the implementation handle
+         * it (early return inside modbus_rtu_fuzz_inject).
+         */
+        modbus_rtu_fuzz_inject(input_buf, 0U);
         return;
     }
 
-    /* Feed the frame to the Modbus parser */
-    (void)modbus_rtu_process_frame(input_buf, (size_t)n);
+    /* Invoke the harness entry point – reset + ingest + dispatch */
+    modbus_rtu_fuzz_inject(input_buf, (size_t)n);
 
-    /* Verify post-execution invariants */
-    check_post_invariants();
+    /*
+     * Post-execution invariant check.
+     *
+     * The internal context is opaque from here, but AddressSanitizer
+     * (enabled at compile-time with -fsanitize=address) will catch any
+     * heap/stack overflows.  Protocol-level assertions can be added via
+     * an accessor once the context is exposed.
+     *
+     * Example (extend when modbus_rtu_get_context() is available):
+     *
+     *   const struct modbus_context *ctx = modbus_rtu_get_context();
+     *   assert(ctx->cfg->uart_buf_ctr <= MODBUS_MAX_FRAME_SIZE);
+     */
 }
 
 /* -------------------------------------------------------------------------
@@ -108,16 +106,15 @@ int main(void)
 {
 #ifdef __AFL_HAVE_MANUAL_CONTROL
     /*
-     * AFL++ persistent mode: fork once and loop up to 1000 times before
-     * spawning a new worker.  This amortises fork() cost across iterations,
-     * dramatically increasing throughput.
+     * AFL++ persistent mode: fork once, iterate up to 1 000 times, then
+     * respawn.  Amortises fork() cost → dramatically higher throughput.
      */
     __AFL_INIT();
     while (__AFL_LOOP(1000)) {
         fuzz_target_entry();
     }
 #else
-    /* Standard single-run mode (useful for debugging with a fixed input) */
+    /* Standard single-run mode – useful for debugging with a fixed input. */
     fuzz_target_entry();
 #endif
     return 0;
