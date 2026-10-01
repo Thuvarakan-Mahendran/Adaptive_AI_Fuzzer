@@ -1,147 +1,206 @@
 /*
- * zephyr_compat.h - Mock Zephyr RTOS dependencies for UART async-rx fuzzing
+ * zephyr_compat.h – Host-side compatibility shim for the UART async-rx fuzzing target
  *
- * Provides host-side stubs for Zephyr types, device-tree bindings, interrupt
- * registration primitives, and DMA structures so that uart_async_rx.c can be
- * compiled and exercised on a native x86-64 host.
+ * Provides every symbol required by the refactored uart_async_rx.c so it
+ * compiles without the Zephyr build system on a standard C11 host.
+ *
+ * What the upstream actually uses (from inspection of
+ *   zephyr-upstream/drivers/serial/uart_async_rx.c  and
+ *   zephyr-upstream/include/zephyr/drivers/serial/uart_async_rx.h):
+ *
+ *   - <string.h>                   → memset, offsetof
+ *   - <zephyr/drivers/uart.h>      → not directly called; pulled in for types
+ *   - <zephyr/drivers/serial/uart_async_rx.h>
+ *       struct uart_async_rx_buf   (wr_idx:7, completed:1, buffer[])
+ *       struct uart_async_rx       (config, pending_bytes, free_buf_cnt,
+ *                                   buf_len, drv_buf_idx, rd_buf_idx, rd_idx)
+ *       struct uart_async_rx_config (buffer, length, buf_cnt)
+ *       UART_ASYNC_RX_BUF_OVERHEAD
+ *   - atomic_t, atomic_dec/inc/add/sub
+ *   - BIT(n), MIN(a,b)
+ *   - __ASSERT_NO_MSG
+ *   - EINVAL
+ *
+ * FUZZING ONLY – Do not ship in production firmware.
  */
 
 #ifndef ZEPHYR_COMPAT_UART_H
 #define ZEPHYR_COMPAT_UART_H
 
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+/* =========================================================================
+ * Standard C headers
+ * ========================================================================= */
+
 #include <assert.h>
+#include <errno.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-/* ---------------------------------------------------------------------------
- * Primitive type aliases
- * --------------------------------------------------------------------------- */
+/* =========================================================================
+ * Logging macros (mod 2.3)
+ *
+ * LOG_ERR / LOG_WRN / LOG_INF → printf / fprintf(stderr)
+ * LOG_DBG → silenced to reduce fuzzing overhead.
+ *
+ * The upstream uart_async_rx.c does not call any LOG_* macros itself,
+ * but the harness and any future extension may, so definitions are
+ * provided here.  The variadic form works even with zero extra arguments
+ * because the trailing ##__VA_ARGS__ token-paste suppresses the comma.
+ * ========================================================================= */
 
-typedef int32_t  k_timeout_t;
-typedef uint32_t k_ticks_t;
+#define LOG_MODULE_REGISTER(name, level)   /* no-op */
+#define LOG_MODULE_DECLARE(name, level)    /* no-op */
 
-/* ---------------------------------------------------------------------------
- * Logging stubs
- * --------------------------------------------------------------------------- */
+#define LOG_ERR(fmt, ...) \
+    do { fprintf(stderr, "[LOG_ERR] " fmt "\n", ##__VA_ARGS__); } while (0)
+#define LOG_WRN(fmt, ...) \
+    do { fprintf(stderr, "[LOG_WRN] " fmt "\n", ##__VA_ARGS__); } while (0)
+#define LOG_INF(fmt, ...) \
+    do { printf("[LOG_INF] " fmt "\n", ##__VA_ARGS__); } while (0)
+#define LOG_DBG(fmt, ...) \
+    do { } while (0)
 
-#ifdef FUZZER_VERBOSE
-#  define LOG_ERR(fmt, ...)  fprintf(stderr, "[ERR] " fmt "\n", ##__VA_ARGS__)
-#  define LOG_WRN(fmt, ...)  fprintf(stderr, "[WRN] " fmt "\n", ##__VA_ARGS__)
-#  define LOG_INF(fmt, ...)  fprintf(stderr, "[INF] " fmt "\n", ##__VA_ARGS__)
-#  define LOG_DBG(fmt, ...)  fprintf(stderr, "[DBG] " fmt "\n", ##__VA_ARGS__)
-#else
-#  define LOG_ERR(fmt, ...)  do {} while (0)
-#  define LOG_WRN(fmt, ...)  do {} while (0)
-#  define LOG_INF(fmt, ...)  do {} while (0)
-#  define LOG_DBG(fmt, ...)  do {} while (0)
+/* =========================================================================
+ * Assertions
+ * ========================================================================= */
+
+#define __ASSERT_NO_MSG(cond)      assert(cond)
+#define __ASSERT(cond, fmt, ...)   assert(cond)
+
+/* =========================================================================
+ * atomic_t – single-threaded fuzzer: plain int, no atomics needed
+ *
+ * Zephyr's atomic operations (atomic_inc, atomic_dec, atomic_add,
+ * atomic_sub) modify an atomic_t by value and return the previous value.
+ * Here we use plain int with cast stubs; thread-safety is irrelevant.
+ * ========================================================================= */
+
+typedef int atomic_t;
+
+static inline int atomic_inc(atomic_t *target)
+{
+    int old = *target;
+    (*target)++;
+    return old;
+}
+
+static inline int atomic_dec(atomic_t *target)
+{
+    int old = *target;
+    (*target)--;
+    return old;
+}
+
+static inline int atomic_add(atomic_t *target, int val)
+{
+    int old = *target;
+    *target += val;
+    return old;
+}
+
+static inline int atomic_sub(atomic_t *target, int val)
+{
+    int old = *target;
+    *target -= val;
+    return old;
+}
+
+/* =========================================================================
+ * Utility macros used by the upstream source
+ * ========================================================================= */
+
+#ifndef MIN
+#  define MIN(a, b)  ((a) < (b) ? (a) : (b))
 #endif
 
-#define LOG_MODULE_REGISTER(name, level)  /* no-op */
-#define LOG_MODULE_DECLARE(name, level)   /* no-op */
+#ifndef BIT
+#  define BIT(n)  (1U << (n))
+#endif
 
-/* ---------------------------------------------------------------------------
- * Mock hardware device / device-tree structures
+/* =========================================================================
+ * UART async-rx structures and constants
  *
- * Zephyr passes a `const struct device *dev` to driver callbacks.  We expose
- * a single static mock device that the harness passes everywhere.
- * --------------------------------------------------------------------------- */
+ * Copied verbatim from:
+ *   zephyr-upstream/include/zephyr/drivers/serial/uart_async_rx.h
+ *
+ * These are the types actually used by uart_async_rx.c.  They are placed
+ * here so the refactored standalone source needs only one include path.
+ * ========================================================================= */
 
-struct device {
-    const char *name;
-    void       *data;   /* driver-private data pointer */
-    void       *config; /* driver config pointer */
-    void       *api;    /* driver API pointer */
+/**
+ * @brief RX buffer structure which holds the buffer and its state.
+ *
+ * The buffer[] flexible array member is allocated as part of a larger
+ * slab; see get_buf() in uart_async_rx.c.
+ */
+struct uart_async_rx_buf {
+    /* Write index incremented when new data is reported received. */
+    uint8_t wr_idx    : 7;
+    /* Set to 1 when the buffer is released by the driver. */
+    uint8_t completed : 1;
+    /* Data location passed to the UART driver. */
+    uint8_t buffer[];
 };
 
-/* Macro used in Zephyr drivers: DEVICE_DT_GET(node_id) → static mock device */
-extern struct device mock_uart_device;
-#define DEVICE_DT_GET(node)  (&mock_uart_device)
-#define DEVICE_DT_INST_GET(inst) (&mock_uart_device)
+/** @brief Amount of per-buffer management overhead in bytes. */
+#define UART_ASYNC_RX_BUF_OVERHEAD  offsetof(struct uart_async_rx_buf, buffer)
 
-/* ---------------------------------------------------------------------------
- * Interrupt stubs (IRQ_CONNECT, irq_enable, irq_disable)
- * --------------------------------------------------------------------------- */
-
-#define IRQ_CONNECT(irq, pri, fn, arg, flags)  do {} while (0)
-#define irq_enable(irq)                         do {} while (0)
-#define irq_disable(irq)                        do {} while (0)
-
-/* ---------------------------------------------------------------------------
- * Kernel synchronization stubs (single-threaded fuzzer → all no-ops)
- * --------------------------------------------------------------------------- */
-
-typedef struct { int dummy; } k_sem;
-typedef struct { int dummy; } k_mutex;
-typedef struct { int dummy; } k_work;
-typedef struct { int dummy; } k_work_q;
-
-#define k_sem_init(s, init, lim)     do {} while (0)
-#define k_sem_take(s, t)             (0)
-#define k_sem_give(s)                do {} while (0)
-#define k_mutex_init(m)              do {} while (0)
-#define k_mutex_lock(m, t)           (0)
-#define k_mutex_unlock(m)            do {} while (0)
-
-#define K_NO_WAIT   0
-#define K_FOREVER  -1
-#define K_MSEC(ms) (ms)
-
-/* ---------------------------------------------------------------------------
- * DMA / scatter-gather stubs
- * --------------------------------------------------------------------------- */
-
-struct dma_block_config {
-    uint32_t source_address;
-    uint32_t dest_address;
-    uint32_t block_size;
-    struct dma_block_config *next_block;
+/** @brief UART asynchronous RX helper configuration. */
+struct uart_async_rx_config {
+    uint8_t *buffer;   /**< Pointer to the backing buffer slab. */
+    size_t   length;   /**< Total length of the slab in bytes.  */
+    uint8_t  buf_cnt;  /**< Number of sub-buffers in the slab.  */
 };
 
-struct dma_config {
-    uint32_t channel_direction;
-    uint32_t source_data_size;
-    uint32_t dest_data_size;
-    uint32_t source_burst_length;
-    uint32_t dest_burst_length;
-    uint32_t block_count;
-    struct dma_block_config *head_block;
-    void (*dma_callback)(const struct device *dev, void *user_data,
-                         uint32_t channel, int status);
-    void *user_data;
+/** @brief UART asynchronous RX helper instance state. */
+struct uart_async_rx {
+    const struct uart_async_rx_config *config;
+
+    /** Total pending bytes across all sub-buffers. */
+    atomic_t pending_bytes;
+
+    /** Number of sub-buffers currently free (not held by driver). */
+    atomic_t free_buf_cnt;
+
+    /** Single sub-buffer data capacity (bytes, without overhead). */
+    uint8_t  buf_len;
+
+    /** Index of the next sub-buffer to hand to the UART driver. */
+    uint8_t  drv_buf_idx;
+
+    /** Index of the sub-buffer currently being consumed by the user. */
+    uint8_t  rd_buf_idx;
+
+    /** Read cursor within the current consume buffer. */
+    uint8_t  rd_idx;
 };
 
-#define DMA_MEMORY_TO_MEMORY  0
-#define DMA_PERIPHERAL_TO_MEMORY 1
+/* =========================================================================
+ * Inline accessor – matches the static inline in uart_async_rx.h
+ * ========================================================================= */
 
-/* DMA API stubs – always succeed without doing hardware I/O */
-static inline int dma_config(const struct device *dev, uint32_t channel,
-                              struct dma_config *config) {
-    (void)dev; (void)channel; (void)config;
-    return 0;
-}
-static inline int dma_start(const struct device *dev, uint32_t channel) {
-    (void)dev; (void)channel;
-    return 0;
-}
-static inline int dma_stop(const struct device *dev, uint32_t channel) {
-    (void)dev; (void)channel;
-    return 0;
+static inline uint8_t uart_async_rx_get_buf_len(struct uart_async_rx *async_rx)
+{
+    return async_rx->buf_len;
 }
 
-/* ---------------------------------------------------------------------------
- * Miscellaneous Zephyr helpers
- * --------------------------------------------------------------------------- */
+/* =========================================================================
+ * Miscellaneous helpers
+ * ========================================================================= */
 
-#define ARRAY_SIZE(arr)   (sizeof(arr) / sizeof((arr)[0]))
-#define BIT(n)            (1U << (n))
+#define ARRAY_SIZE(arr)  (sizeof(arr) / sizeof((arr)[0]))
+
+/* CONTAINER_OF – needed by harness, not by the upstream source itself */
 #define CONTAINER_OF(ptr, type, field) \
     ((type *)((char *)(ptr) - offsetof(type, field)))
 
-#define __ASSERT(cond, fmt, ...)  assert(cond)
-#define __ASSERT_NO_MSG(cond)     assert(cond)
+/* Timeout constants – not used by uart_async_rx.c but kept for completeness */
+typedef int32_t k_timeout_t;
+#define K_NO_WAIT   0
+#define K_FOREVER  -1
 
 #endif /* ZEPHYR_COMPAT_UART_H */

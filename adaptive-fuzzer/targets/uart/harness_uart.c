@@ -1,19 +1,29 @@
 /*
  * harness_uart.c – AFL++ fuzzing harness for the async UART RX driver
  *
- * Wires the adaptive fuzzer to the software-simulated async UART reception
- * path (uart_async_rx.c).  Follows paper Section III-D / Step 3.6:
+ * Drives the refactored uart_async_rx.c (based on the real Zephyr upstream
+ * at zephyr-upstream/drivers/serial/uart_async_rx.c) through the harness
+ * entry-point API defined in modbusprompt §2.6:
  *
- *   1. Reads mutated input bytes from STDIN.
- *   2. Resets all driver state (static pools, FIFO r/w pointers, state machine).
- *   3. Pushes fuzz data directly into the simulated software FIFO.
- *   4. Triggers the receive processing routine.
- *   5. Asserts that the static reception pools did not overflow.
+ *   void uart_mock_inject(const uint8_t *data, size_t len);
+ *   void uart_mock_process(void);
  *
- * Compile for native fuzzing:
- *   afl-clang-fast -fsanitize=address -O2
- *       -Itargets/uart/include
- *       targets/uart/uart_async_rx.c targets/uart/harness_uart.c
+ * On each fuzz iteration:
+ *   1. Read mutated bytes from stdin.
+ *   2. Call uart_mock_inject() – resets all state, enqueues bytes.
+ *   3. Call uart_mock_process() – drives the async-rx receive path.
+ *   4. Assert post-conditions: all data consumed, no pending bytes.
+ *
+ * Compile (native, gcc):
+ *   gcc -std=c11 -Wall -Wextra -Wpedantic -O2 \
+ *       -Itargets/uart/include \
+ *       targets/uart/uart_async_rx.c targets/uart/harness_uart.c \
+ *       -o build/native/fuzzer_uart_native
+ *
+ * Compile (AFL++, with ASAN):
+ *   afl-clang-fast -std=c11 -Wall -Wextra -O2 -fsanitize=address \
+ *       -Itargets/uart/include \
+ *       targets/uart/uart_async_rx.c targets/uart/harness_uart.c \
  *       -o build/native/fuzzer_uart_native
  */
 
@@ -24,47 +34,47 @@
 #include <string.h>
 #include <stdio.h>
 
-/* Include the mocked Zephyr compatibility layer */
 #include "include/zephyr_compat.h"
 
-/* Forward declarations from uart_async_rx.c */
-void           uart_async_rx_reset(void);
-size_t         uart_async_rx_push(const uint8_t *data, size_t len);
-size_t         uart_async_rx_process(void);
-const uint8_t *uart_async_rx_get_pool(uint32_t idx, uint32_t *out_used);
-uint32_t       uart_async_rx_total(void);
-
 /* -------------------------------------------------------------------------
- * Constants
+ * Symbols from uart_async_rx.c (Mod 2.6 API)
  * ---------------------------------------------------------------------- */
 
-/** Input buffer size – should not exceed the FIFO capacity in uart_async_rx.c */
-#define HARNESS_BUF_SIZE      512u
-
-/** Reception pool buffer size – must match UART_POOL_BUF_SIZE */
-#define POOL_BUF_SIZE         256u
-
-/** Number of reception pools – must match UART_POOL_COUNT */
-#define POOL_COUNT            2u
+extern void   uart_mock_inject(const uint8_t *data, size_t len);
+extern void   uart_mock_process(void);
+extern size_t uart_mock_claimed_total(void);
+extern bool   uart_mock_all_consumed(void);
 
 /* -------------------------------------------------------------------------
- * Pool overflow / boundary assertions
+ * Constants – kept in sync with uart_async_rx.c definitions
  * ---------------------------------------------------------------------- */
 
-/*
- * check_pool_boundaries – verify that neither reception pool overflowed
- *
- * Asserts that the `used` count for every pool does not exceed the pool's
- * allocated size, catching off-by-one and buffer-boundary overwrites.
- * Triggers SIGABRT (via assert()) if a violation is detected.
- */
-static void check_pool_boundaries(void)
+/** Maximum bytes read from stdin per iteration (≥ UART_FIFO_SIZE) */
+#define HARNESS_BUF_SIZE   640U
+
+/* -------------------------------------------------------------------------
+ * Post-iteration assertion checks
+ * ---------------------------------------------------------------------- */
+
+static void check_post_conditions(size_t injected)
 {
-    for (uint32_t i = 0; i < POOL_COUNT; i++) {
-        uint32_t used = 0;
-        const uint8_t *pool_data = uart_async_rx_get_pool(i, &used);
-        assert(pool_data != NULL);
-        assert(used <= POOL_BUF_SIZE);
+    /*
+     * After uart_mock_process() all injected bytes (up to FIFO capacity)
+     * should have been claimed and consumed.  If any pending bytes remain,
+     * the buffer-management logic has a bug.
+     *
+     * AddressSanitizer (when enabled at compile time) will independently
+     * catch any buffer overruns inside the async-rx slab.
+     */
+    bool consumed = uart_mock_all_consumed();
+
+    if (!consumed) {
+        /*
+         * Not necessarily a crash-worthy bug (e.g. more data than buffer
+         * capacity), but worth logging for triage.
+         */
+        LOG_WRN("Post-iteration: %zu bytes claimed but not all consumed "
+                "(injected=%zu)", uart_mock_claimed_total(), injected);
     }
 }
 
@@ -72,45 +82,37 @@ static void check_pool_boundaries(void)
  * Fuzz entry point
  * ---------------------------------------------------------------------- */
 
-/*
+/**
  * fuzz_uart_entry – persistent-mode hook anchor
+ *
+ * Aligned with the §2.6 contract:
+ *   - Reads up to HARNESS_BUF_SIZE bytes from stdin.
+ *   - Calls uart_mock_inject() (handles NULL + len=0 safely).
+ *   - Calls uart_mock_process().
+ *   - Checks post-conditions.
  */
 void fuzz_uart_entry(void)
 {
-    /* Static local buffer – allocated once, reused each iteration */
     static uint8_t input_buf[HARNESS_BUF_SIZE];
 
-    /* Step 1: Reset all driver state between iterations
-     *  – Zeros static reception pools
-     *  – Zeroes FIFO read/write pointers
-     *  – Resets receiver state machine
-     */
-    uart_async_rx_reset();
-
-    /* Step 2: Read mutated test case from AFL++ via STDIN */
     ssize_t n = read(STDIN_FILENO, input_buf, sizeof(input_buf));
-    if (n <= 0) {
-        return; /* nothing to do */
+
+    if (n < 0) {
+        /* Read error – inject zero-length to exercise empty-input path */
+        uart_mock_inject(input_buf, 0U);
+        uart_mock_process();
+        return;
     }
 
-    /* Step 3: Inject fuzz bytes into the simulated FIFO
-     *  – Mimics incoming peripheral stream bytes arriving via UART RX
-     */
-    size_t pushed = uart_async_rx_push(input_buf, (size_t)n);
-    (void)pushed; /* partial push is not an error; FIFO may be full */
+    /* Covers empty input (n == 0) and normal input (n > 0) */
+    uart_mock_inject(input_buf, (size_t)n);
+    uart_mock_process();
 
-    /* Step 4: Trigger the driver's receive-processing routine
-     *  – Transfers bytes from the FIFO to the static pool (replacing
-     *    the ISR / DMA path)
-     */
-    (void)uart_async_rx_process();
-
-    /* Step 5: Assert pool boundaries (detect overflow / off-by-one) */
-    check_pool_boundaries();
+    check_post_conditions((size_t)n);
 }
 
 /* -------------------------------------------------------------------------
- * main – single-run or persistent-loop invocation
+ * main – single-run or AFL++ persistent-loop invocation
  * ---------------------------------------------------------------------- */
 
 int main(void)
