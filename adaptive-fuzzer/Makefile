@@ -158,3 +158,188 @@ $(BUILD_NATIVE) $(BUILD_ARM) $(BUILD_RISCV):
 clean:
 	rm -rf $(BUILD_NATIVE) $(BUILD_ARM) $(BUILD_RISCV)
 	@echo "[clean] Build artefacts removed."
+
+# =============================================================================
+# LAVA-M Coreutils targets
+#
+# These are full Coreutils 8.24 source trees instrumented with AFL++.
+# They CANNOT be built with a direct $(AFL_CC) $(SRCS) -o $@ rule because:
+#   1. Each tree needs generated config headers (config.h, lib/config.h)
+#      produced by ./configure; without them ~200 Gnulib source files fail.
+#   2. libcoreutils.a and the Gnulib portability library (libgnu.a) are
+#      intermediate archives linked into each utility; these must be built
+#      by the recursive Autotools make, not hand-assembled.
+#   3. Autotools-generated sources (version.c, etc.) do not exist before
+#      make runs; the dependency graph is managed by the generated Makefiles.
+#   4. The existing NATIVE_CFLAGS include -fsanitize=address which conflicts
+#      with the Autotools configure self-test programs; LAVA-M builds pass
+#      their own CFLAGS='-g -O2' through the sub-make.
+#
+# Design: each target delegates entirely to the Autotools sub-build, then
+# copies the finished binary into $(BUILD_NATIVE) under the fuzzer_* name.
+# Source trees live in targets/lava_m/<util>/coreutils-8.24-lava-safe/ and
+# are copies of the originals; the upstream corpus is never modified.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# LAVA-M source and output paths
+# -----------------------------------------------------------------------------
+
+LAVA_BASE   := targets/lava_m
+LAVA_JOBS   := $(shell nproc)
+
+#LAVA_CC     := afl-clang-fast
+#LAVA_CXX    := afl-clang-fast++
+# -DSLOW_BUT_NO_HACKS=1: gnulib freadseek.c portability fix.
+# glibc 2.35+ (Ubuntu 22.04+) removed _IO_ftrylockfile which gnulib used to
+# detect GNU libc and select a fast file-pointer path.  Without this flag,
+# freadseek.c emits a #error and the build fails.  SLOW_BUT_NO_HACKS forces
+# the generic fseek-based path, which is fully correct for fuzzing purposes.
+#LAVA_CFLAGS := -g -O2 -DSLOW_BUT_NO_HACKS=1
+LAVA_WRAPPER := afl-clang-fast
+LAVA_REAL_CC := /usr/lib/llvm-14/bin/clang
+LAVA_REAL_CXX := /usr/lib/llvm-14/bin/clang++
+LAVA_CFLAGS := -g -O2 -DSLOW_BUT_NO_HACKS=1 \
+               -include $(CURDIR)/targets/lava_m/lava_compat.h
+
+FUZZER_BASE64 := $(BUILD_NATIVE)/fuzzer_base64
+FUZZER_MD5SUM := $(BUILD_NATIVE)/fuzzer_md5sum
+FUZZER_UNIQ   := $(BUILD_NATIVE)/fuzzer_uniq
+FUZZER_WHO    := $(BUILD_NATIVE)/fuzzer_who
+
+# Corpus directories
+CORPUS_BASE64 := corpus/lava_base64
+CORPUS_MD5SUM := corpus/lava_md5sum
+CORPUS_UNIQ   := corpus/lava_uniq
+CORPUS_WHO    := corpus/lava_who
+
+.PHONY: lava lava_base64 lava_md5sum lava_uniq lava_who clean_lava smoke_lava
+
+# Build all four LAVA-M utilities
+lava: lava_base64 lava_md5sum lava_uniq lava_who
+	@echo "[LAVA-M] All four targets staged under $(BUILD_NATIVE)."
+
+# ---- base64 -----------------------------------------------------------------
+lava_base64: $(FUZZER_BASE64)
+
+$(FUZZER_BASE64): | $(BUILD_NATIVE) $(CORPUS_BASE64)
+	@echo "[LAVA-M] Configuring base64 ..."
+	cd $(LAVA_BASE)/base64/coreutils-8.24-lava-safe && \
+	  FORCE_UNSAFE_CONFIGURE=1 \
+	  CC='env AFL_CC=$(LAVA_REAL_CC) $(LAVA_WRAPPER) --afl-llvm' \
+	  CXX='env AFL_CC=$(LAVA_REAL_CXX) $(LAVA_WRAPPER) --afl-llvm' \
+	  CFLAGS='$(LAVA_CFLAGS)' \
+	  ./configure --prefix="$$(pwd)/install" --disable-nls --disable-man
+	@echo "[LAVA-M] Building base64 ..."
+	$(MAKE) -C $(LAVA_BASE)/base64/coreutils-8.24-lava-safe -j$(LAVA_JOBS) \
+	  HELP2MAN=true \
+	  man1_MANS= \
+	  EXTRA_MANS=
+	@test -f $(LAVA_BASE)/base64/coreutils-8.24-lava-safe/src/base64 || \
+	  (echo "[LAVA-M] ERROR: src/base64 not found after build" && exit 1)
+	cp $(LAVA_BASE)/base64/coreutils-8.24-lava-safe/src/base64 $@
+	@echo "[LAVA-M] Staged $@"
+
+# ---- md5sum -----------------------------------------------------------------
+lava_md5sum: $(FUZZER_MD5SUM)
+
+$(FUZZER_MD5SUM): | $(BUILD_NATIVE) $(CORPUS_MD5SUM)
+	@echo "[LAVA-M] Configuring md5sum ..."
+	cd $(LAVA_BASE)/md5sum/coreutils-8.24-lava-safe && \
+	  FORCE_UNSAFE_CONFIGURE=1 \
+          CC='env AFL_CC=$(LAVA_REAL_CC) $(LAVA_WRAPPER) --afl-llvm' \
+          CXX='env AFL_CC=$(LAVA_REAL_CXX) $(LAVA_WRAPPER) --afl-llvm' \
+          CFLAGS='$(LAVA_CFLAGS)' \
+          ./configure --prefix="$$(pwd)/install" --disable-nls --disable-man
+	@echo "[LAVA-M] Building md5sum ..."
+	$(MAKE) -C $(LAVA_BASE)/md5sum/coreutils-8.24-lava-safe -j$(LAVA_JOBS) \
+          HELP2MAN=true \
+          man1_MANS= \
+          EXTRA_MANS=
+	@test -f $(LAVA_BASE)/md5sum/coreutils-8.24-lava-safe/src/md5sum || \
+	  (echo "[LAVA-M] ERROR: src/md5sum not found after build" && exit 1)
+	cp $(LAVA_BASE)/md5sum/coreutils-8.24-lava-safe/src/md5sum $@
+	@echo "[LAVA-M] Staged $@"
+
+# ---- uniq -------------------------------------------------------------------
+lava_uniq: $(FUZZER_UNIQ)
+
+$(FUZZER_UNIQ): | $(BUILD_NATIVE) $(CORPUS_UNIQ)
+	@echo "[LAVA-M] Configuring uniq ..."
+	cd $(LAVA_BASE)/uniq/coreutils-8.24-lava-safe && \
+	  FORCE_UNSAFE_CONFIGURE=1 \
+          CC='env AFL_CC=$(LAVA_REAL_CC) $(LAVA_WRAPPER) --afl-llvm' \
+          CXX='env AFL_CC=$(LAVA_REAL_CXX) $(LAVA_WRAPPER) --afl-llvm' \
+          CFLAGS='$(LAVA_CFLAGS)' \
+          ./configure --prefix="$$(pwd)/install" --disable-nls --disable-man
+	@echo "[LAVA-M] Building uniq ..."
+	$(MAKE) -C $(LAVA_BASE)/uniq/coreutils-8.24-lava-safe -j$(LAVA_JOBS) \
+          HELP2MAN=true \
+          man1_MANS= \
+          EXTRA_MANS=
+	@test -f $(LAVA_BASE)/uniq/coreutils-8.24-lava-safe/src/uniq || \
+	  (echo "[LAVA-M] ERROR: src/uniq not found after build" && exit 1)
+	cp $(LAVA_BASE)/uniq/coreutils-8.24-lava-safe/src/uniq $@
+	@echo "[LAVA-M] Staged $@"
+
+# ---- who --------------------------------------------------------------------
+lava_who: $(FUZZER_WHO)
+
+$(FUZZER_WHO): | $(BUILD_NATIVE) $(CORPUS_WHO)
+	@echo "[LAVA-M] Configuring who ..."
+	cd $(LAVA_BASE)/who/coreutils-8.24-lava-safe && \
+	  FORCE_UNSAFE_CONFIGURE=1 \
+          CC='env AFL_CC=$(LAVA_REAL_CC) $(LAVA_WRAPPER) --afl-llvm' \
+          CXX='env AFL_CC=$(LAVA_REAL_CXX) $(LAVA_WRAPPER) --afl-llvm' \
+          CFLAGS='$(LAVA_CFLAGS)' \
+          ./configure --prefix="$$(pwd)/install" --disable-nls --disable-man
+	@echo "[LAVA-M] Building who ..."
+	$(MAKE) -C $(LAVA_BASE)/who/coreutils-8.24-lava-safe -j$(LAVA_JOBS) \
+          HELP2MAN=true \
+          man1_MANS= \
+          EXTRA_MANS=
+	@test -f $(LAVA_BASE)/who/coreutils-8.24-lava-safe/src/who || \
+	  (echo "[LAVA-M] ERROR: src/who not found after build" && exit 1)
+	cp $(LAVA_BASE)/who/coreutils-8.24-lava-safe/src/who $@
+	@echo "[LAVA-M] Staged $@"
+
+# -----------------------------------------------------------------------------
+# clean_lava – remove staged LAVA-M binaries only
+# Does NOT delete source copies or the upstream corpus.
+# -----------------------------------------------------------------------------
+
+clean_lava:
+	rm -f $(FUZZER_BASE64) $(FUZZER_MD5SUM) $(FUZZER_UNIQ) $(FUZZER_WHO)
+	@echo "[LAVA-M] Staged binaries removed. Source trees preserved."
+
+# -----------------------------------------------------------------------------
+# smoke_lava – functional smoke tests for all four staged binaries
+# Verifies staged binaries exist before running any test.
+# -----------------------------------------------------------------------------
+
+smoke_lava: $(FUZZER_BASE64) $(FUZZER_MD5SUM) $(FUZZER_UNIQ) $(FUZZER_WHO)
+	@echo "[smoke_lava] Verifying staged binaries ..."
+	@test -x $(FUZZER_BASE64) || (echo "MISSING: $(FUZZER_BASE64)" && exit 1)
+	@test -x $(FUZZER_MD5SUM) || (echo "MISSING: $(FUZZER_MD5SUM)" && exit 1)
+	@test -x $(FUZZER_UNIQ)   || (echo "MISSING: $(FUZZER_UNIQ)"   && exit 1)
+	@test -x $(FUZZER_WHO)    || (echo "MISSING: $(FUZZER_WHO)"     && exit 1)
+	@echo "--- base64 smoke test ---"
+	echo "SGVsbG8gV29ybGQh" > $(CORPUS_BASE64)/seed.txt
+	$(FUZZER_BASE64) -d $(CORPUS_BASE64)/seed.txt
+	@echo "--- md5sum smoke test ---"
+	printf 'hello world' > $(CORPUS_MD5SUM)/test.txt
+	md5sum $(CORPUS_MD5SUM)/test.txt > $(CORPUS_MD5SUM)/seed.txt
+	$(FUZZER_MD5SUM) -c $(CORPUS_MD5SUM)/seed.txt
+	@echo "--- uniq smoke test ---"
+	printf 'line1\nline1\nline2\n' > $(CORPUS_UNIQ)/seed.txt
+	$(FUZZER_UNIQ) $(CORPUS_UNIQ)/seed.txt
+	@echo "--- who smoke test ---"
+	$(FUZZER_WHO) $(CORPUS_WHO)/utmp.clean 2>&1 || true
+	@echo "[smoke_lava] All smoke tests completed."
+
+# -----------------------------------------------------------------------------
+# Corpus directory guards for LAVA-M
+# -----------------------------------------------------------------------------
+
+$(CORPUS_BASE64) $(CORPUS_MD5SUM) $(CORPUS_UNIQ) $(CORPUS_WHO):
+	mkdir -p $@

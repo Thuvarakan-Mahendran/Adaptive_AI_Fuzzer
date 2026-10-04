@@ -1,7 +1,0 @@
-# environment variables:
-AFL_CUSTOM_INFO_PROGRAM=./build/native/fuzzer_modbus_native
-AFL_CUSTOM_INFO_PROGRAM_ARGV=
-AFL_CUSTOM_INFO_OUT=fuzzing_out/test_modbus/default
-AFL_SKIP_CPUFREQ=1
-# command line:
-'afl-fuzz' '-i' 'corpus/modbus_seeds' '-o' 'fuzzing_out/test_modbus' '--' './build/native/fuzzer_modbus_native'

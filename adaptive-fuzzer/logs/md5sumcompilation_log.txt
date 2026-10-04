@@ -1,0 +1,2232 @@
+captainalan2@captainalan2-device:~/Research/adaptive-fuzzer$ make lava_md5sum
+[LAVA-M] Configuring md5sum ...
+cd targets/lava_m/md5sum/coreutils-8.24-lava-safe && \
+  FORCE_UNSAFE_CONFIGURE=1 \
+          CC='env AFL_CC=/usr/lib/llvm-14/bin/clang afl-clang-fast --afl-llvm' \
+          CXX='env AFL_CC=/usr/lib/llvm-14/bin/clang++ afl-clang-fast --afl-llvm' \
+          CFLAGS='-g -O2 -DSLOW_BUT_NO_HACKS=1 -include /home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/lava_compat.h' \
+          ./configure --prefix="$(pwd)/install" --disable-nls --disable-man
+configure: WARNING: unrecognized options: --disable-man
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether make supports nested variables... (cached) yes
+checking for style of include used by make... GNU
+checking for gcc... env AFL_CC=/usr/lib/llvm-14/bin/clang afl-clang-fast --afl-llvm
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables...
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether env AFL_CC=/usr/lib/llvm-14/bin/clang afl-clang-fast --afl-llvm accepts -g... yes
+checking for env AFL_CC=/usr/lib/llvm-14/bin/clang afl-clang-fast --afl-llvm option to accept ISO C89... none needed
+checking whether env AFL_CC=/usr/lib/llvm-14/bin/clang afl-clang-fast --afl-llvm understands -c and -o together... yes
+checking dependency style of env AFL_CC=/usr/lib/llvm-14/bin/clang afl-clang-fast --afl-llvm... gcc3
+checking for env AFL_CC=/usr/lib/llvm-14/bin/clang afl-clang-fast --afl-llvm option to accept ISO C99... none needed
+checking for env AFL_CC=/usr/lib/llvm-14/bin/clang afl-clang-fast --afl-llvm option to accept ISO Standard C... (cached) none needed
+checking how to run the C preprocessor... env AFL_CC=/usr/lib/llvm-14/bin/clang afl-clang-fast --afl-llvm -E
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking whether env AFL_CC=/usr/lib/llvm-14/bin/clang afl-clang-fast --afl-llvm needs -traditional... no
+checking for ranlib... ranlib
+checking whether ln -s works... yes
+checking for Minix Amsterdam compiler... no
+checking for ar... ar
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking minix/config.h usability... no
+checking minix/config.h presence... no
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking whether _XOPEN_SOURCE should be defined... no
+checking for _LARGEFILE_SOURCE value needed for large files... no
+checking for special C compiler options needed for large files... no
+checking for _FILE_OFFSET_BITS value needed for large files... no
+configure: autobuild project... GNU coreutils
+configure: autobuild revision... 8.24
+configure: autobuild hostname... captainalan2-device
+configure: autobuild timestamp... 20261002T093829Z
+checking for fchmod... yes
+checking for pathconf... yes
+checking for btowc... yes
+checking for canonicalize_file_name... yes
+checking for realpath... yes
+checking for readlinkat... yes
+checking for chown... yes
+checking for fchown... yes
+checking for _set_invalid_parameter_handler... no
+checking for fchdir... yes
+checking for fdopendir... yes
+checking for faccessat... yes
+checking for posix_fadvise... yes
+checking for fchmodat... yes
+checking for lchmod... yes
+checking for fcntl... yes
+checking for symlink... yes
+checking for mempcpy... yes
+checking for isblank... yes
+checking for iswctype... yes
+checking for mbsrtowcs... yes
+checking for wmemchr... yes
+checking for wmemcpy... yes
+checking for wmempcpy... yes
+checking for fpurge... no
+checking for __fpurge... yes
+checking for __freadahead... no
+checking for __freading... yes
+checking for __freadptr... no
+checking for __freadptrinc... no
+checking for __fseterr... no
+checking for fstatat... yes
+checking for fsync... yes
+checking for strtof... yes
+checking for ftruncate... yes
+checking for openat... yes
+checking for fstatfs... yes
+checking for futimens... yes
+checking for getdelim... yes
+checking for getdtablesize... yes
+checking for microuptime... no
+checking for nanouptime... no
+checking for getlogin... yes
+checking for flockfile... yes
+checking for funlockfile... yes
+checking for __fsetlocking... yes
+checking for tcgetattr... yes
+checking for tcsetattr... yes
+checking for gettimeofday... yes
+checking for nanotime... no
+checking for getusershell... yes
+checking for iswcntrl... yes
+checking for iswblank... yes
+checking for link... yes
+checking for readlink... yes
+checking for linkat... yes
+checking for lstat... yes
+checking for mbsinit... yes
+checking for mbrtowc... yes
+checking for mbrlen... yes
+checking for mbslen... no
+checking for isascii... yes
+checking for mprotect... yes
+checking for getgrouplist... yes
+checking for mkfifo... yes
+checking for mknod... yes
+checking for mkstemp... yes
+checking for nl_langinfo... yes
+checking for pipe... yes
+checking for utmpname... yes
+checking for utmpxname... yes
+checking for secure_getenv... yes
+checking for setenv... yes
+checking for settimeofday... yes
+checking for stime... no
+checking for sigaction... yes
+checking for sigaltstack... yes
+checking for siginterrupt... yes
+checking for snprintf... yes
+checking for stpncpy... yes
+checking for strdup... yes
+checking for strerror_r... yes
+checking for __xpg_strerror_r... yes
+checking for tzset... yes
+checking for strndup... yes
+checking for strtoimax... yes
+checking for strtoumax... yes
+checking for localtime_r... yes
+checking for unlinkat... yes
+checking for futimes... yes
+checking for futimesat... yes
+checking for utimensat... yes
+checking for lutimes... yes
+checking for vasnprintf... no
+checking for wcrtomb... yes
+checking for wcwidth... yes
+checking for wcswidth... yes
+checking for getegid... yes
+checking for ttyname... yes
+checking for newlocale... yes
+checking for sleep... yes
+checking for catgets... yes
+checking for symlinkat... yes
+checking for shutdown... yes
+checking for wctob... yes
+checking for directio... no
+checking for setrlimit... yes
+checking for prctl... yes
+checking for endgrent... yes
+checking for endpwent... yes
+checking for fallocate... yes
+checking for iswspace... yes
+checking for setgroups... yes
+checking for sethostname... yes
+checking for sync... yes
+checking for syncfs... yes
+checking for sysctl... no
+checking for sysinfo... yes
+checking for tcgetpgrp... yes
+checking for getgrgid_nomembers... no
+checking for getgrnam_nomembers... no
+checking for getgrent_nomembers... no
+checking for size_t... yes
+checking for working alloca.h... yes
+checking for alloca... yes
+checking for arpa/inet.h... yes
+checking for features.h... yes
+checking for unistd.h... (cached) yes
+checking for sys/param.h... yes
+checking for sys/socket.h... yes
+checking for dirent.h... yes
+checking for wctype.h... yes
+checking for stdio_ext.h... yes
+checking for sys/stat.h... (cached) yes
+checking for sys/vfs.h... yes
+checking for sys/fs_types.h... no
+checking for netdb.h... yes
+checking for netinet/in.h... yes
+checking for getopt.h... yes
+checking for termios.h... yes
+checking for sys/time.h... yes
+checking for grp.h... yes
+checking for iconv.h... yes
+checking for wchar.h... yes
+checking for stdint.h... (cached) yes
+checking for inttypes.h... (cached) yes
+checking for langinfo.h... yes
+checking for xlocale.h... no
+checking for math.h... yes
+checking for sys/mman.h... yes
+checking for sys/statvfs.h... yes
+checking for sys/select.h... yes
+checking for priv.h... no
+checking for pthread.h... yes
+checking for utmp.h... yes
+checking for utmpx.h... yes
+checking for malloc.h... yes
+checking for sched.h... yes
+checking for selinux/selinux.h... yes
+checking for sys/ioctl.h... yes
+checking for sys/resource.h... yes
+checking for sys/uio.h... yes
+checking for sys/utsname.h... yes
+checking for sys/wait.h... yes
+checking for utime.h... yes
+checking for hurd.h... no
+checking for linux/falloc.h... yes
+checking for paths.h... yes
+checking for stropts.h... no
+checking for sys/systeminfo.h... no
+checking for syslog.h... yes
+checking for pwd.h... yes
+checking for OS.h... no
+checking for gmp.h... no
+checking whether the preprocessor supports include_next... yes
+checking whether system header files limit the line length... no
+checking for d_ino member in directory struct... yes
+checking for long file names... yes
+checking for C/C++ restrict keyword... __restrict
+checking whether <wchar.h> uses 'inline' correctly... yes
+checking for nl_langinfo and CODESET... yes
+checking for a traditional french locale... none
+checking whether strtold conforms to C99... yes
+checking whether malloc, realloc, calloc are POSIX compliant... yes
+checking whether // is distinct from /... no
+checking whether realpath works... yes
+checking for uid_t in sys/types.h... yes
+checking for unistd.h... (cached) yes
+checking for working chown... yes
+checking whether chown dereferences symlinks... yes
+checking whether chown honors trailing slash... yes
+checking whether chown always updates ctime... yes
+checking whether byte ordering is bigendian... no
+checking if environ is properly declared... yes
+checking for complete errno.h... yes
+checking whether strerror_r is declared... yes
+checking for strerror_r... (cached) yes
+checking whether strerror_r returns char *... yes
+checking type of array argument to getgroups... gid_t
+checking whether fchdir is declared... yes
+checking for working fcntl.h... yes
+checking for pid_t... yes
+checking for mode_t... yes
+checking for promoted mode_t type... mode_t
+checking whether fdatasync is declared... yes
+checking for st_dm_mode in struct stat... no
+checking whether strmode is declared... no
+checking for mbstate_t... yes
+checking whether frexp() can be used without linking with libm... yes
+checking whether alarm is declared... yes
+checking whether long double and double are the same... no
+checking whether stdin defaults to large file offsets... yes
+checking whether fseeko is declared... yes
+checking for fseeko... yes
+checking whether fflush works on input streams... no
+checking whether stat file-mode macros are broken... no
+checking for nlink_t... yes
+checking whether lstat correctly handles trailing slash... yes
+checking whether ftello is declared... yes
+checking for ftello... yes
+checking whether ftello works... yes
+checking whether <sys/socket.h> is self-contained... yes
+checking for shutdown... (cached) yes
+checking whether <sys/socket.h> defines the SHUT_* macros... yes
+checking for struct sockaddr_storage... yes
+checking for sa_family_t... yes
+checking for struct sockaddr_storage.ss_family... yes
+checking for library containing gethostbyname... none required
+checking for gethostbyname... yes
+checking for library containing getservbyname... none required
+checking for getservbyname... yes
+checking for library containing inet_ntop... none required
+checking whether inet_ntop is declared... yes
+checking for IPv4 sockets... yes
+checking for IPv6 sockets... yes
+checking whether getcwd (NULL, 0) allocates memory for result... yes
+checking for getcwd with POSIX signature... yes
+checking whether getcwd is declared... yes
+checking whether getdelim is declared... yes
+checking whether getdtablesize is declared... yes
+checking for arithmetic hrtime_t... no
+checking for unsigned long long int... yes
+checking for long long int... yes
+checking whether getline is declared... yes
+checking for ssize_t... yes
+checking for getopt.h... (cached) yes
+checking for getopt_long_only... yes
+checking whether getopt is POSIX compatible... yes
+checking for working GNU getopt function... yes
+checking for working GNU getopt_long function... yes
+checking whether getenv is declared... yes
+checking whether getpass is declared... yes
+checking whether fflush_unlocked is declared... yes
+checking whether flockfile is declared... yes
+checking whether fputs_unlocked is declared... yes
+checking whether funlockfile is declared... yes
+checking whether putc_unlocked is declared... yes
+checking for struct timeval... yes
+checking for wide-enough struct timeval.tv_sec member... yes
+checking for ld used by env AFL_CC=/usr/lib/llvm-14/bin/clang afl-clang-fast --afl-llvm... /usr/bin/ld
+checking if the linker (/usr/bin/ld) is GNU ld... yes
+checking for shared library run path origin... done
+checking for iconv... yes
+checking for working iconv... yes
+checking for iconv declaration...
+         extern size_t iconv (iconv_t cd, char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);
+checking for inline... inline
+checking for off_t... yes
+checking whether stdint.h conforms to C99... yes
+checking for inttypes.h... (cached) yes
+checking whether the inttypes.h PRIxNN macros are broken... no
+checking where to find the exponent in a 'double'... word 1 bit 20
+checking where to find the exponent in a 'float'... word 0 bit 23
+checking for wint_t... yes
+checking whether iswcntrl works... yes
+checking for towlower... yes
+checking for wctype_t... yes
+checking for wctrans_t... yes
+checking whether getc_unlocked is declared... yes
+checking whether we are using the GNU C Library >= 2.1 or uClibc... yes
+checking for wchar_t... yes
+checking for max_align_t... yes
+checking whether NULL can be used in arbitrary expressions... yes
+checking whether imported symbols can be declared weak... yes
+checking for pthread.h... (cached) yes
+checking for pthread_kill in -lpthread... yes
+checking for multithread API to use... posix
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible malloc... yes
+checking for a traditional japanese locale... none
+checking for a transitional chinese locale... none
+checking for a french Unicode locale... none
+checking whether mbrtowc handles incomplete characters... guessing yes
+checking whether mbrtowc works as well as mbtowc... guessing yes
+checking whether mbrtowc handles a NULL pwc argument... guessing yes
+checking whether mbrtowc handles a NULL string argument... guessing yes
+checking whether mbrtowc has a correct return value... guessing yes
+checking whether mbrtowc returns 0 when parsing a NUL character... guessing yes
+checking whether mbrtowc works on empty input... yes
+checking for mmap... yes
+checking for MAP_ANONYMOUS... yes
+checking whether memchr works... yes
+checking whether memrchr is declared... yes
+checking whether <sys/select.h> is self-contained... yes
+checking for library containing setsockopt... none needed
+checking whether select supports a 0 argument... yes
+checking whether select detects invalid fds... yes
+checking for stdbool.h that conforms to C99... yes
+checking for _Bool... yes
+checking for compound literals... yes
+checking whether struct tm is in sys/time.h or time.h... time.h
+checking for struct tm.tm_gmtoff... yes
+checking for external symbol _system_configuration... no
+checking for desired default level of POSIX conformance... none-specified
+checking for sigset_t... yes
+checking whether rmdir works... yes
+checking whether unlink honors trailing slashes... yes
+checking whether unlink of a parent directory fails as it should... guessing yes
+checking for library containing setfilecon... -lselinux
+checking whether setenv is declared... yes
+checking search.h usability... yes
+checking search.h presence... yes
+checking for search.h... yes
+checking for tsearch... yes
+checking whether snprintf returns a byte count as in C99... yes
+checking whether snprintf is declared... yes
+checking whether stpncpy is declared... yes
+checking whether strdup is declared... yes
+checking whether strerror(0) succeeds... yes
+checking for strerror_r with POSIX signature... no
+checking whether __xpg_strerror_r works... yes
+checking for mmap... (cached) yes
+checking for MAP_ANONYMOUS... yes
+checking whether strncat works... yes
+checking whether strndup is declared... yes
+checking whether strnlen is declared... yes
+checking whether strsignal is declared... yes
+checking whether sys_siglist is declared... no
+checking whether ldexp() can be used without linking with libm... yes
+checking whether strtoimax is declared... yes
+checking whether strtoumax is declared... yes
+checking for struct timespec in <time.h>... yes
+checking whether clearerr_unlocked is declared... yes
+checking whether feof_unlocked is declared... yes
+checking whether ferror_unlocked is declared... yes
+checking whether fgets_unlocked is declared... yes
+checking whether fputc_unlocked is declared... yes
+checking whether fread_unlocked is declared... yes
+checking whether fwrite_unlocked is declared... yes
+checking whether getchar_unlocked is declared... yes
+checking whether putchar_unlocked is declared... yes
+checking whether unsetenv is declared... yes
+checking whether the utimes function works... yes
+checking for struct utimbuf... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for intmax_t... yes
+checking for snprintf... (cached) yes
+checking for strnlen... yes
+checking for wcslen... yes
+checking for wcsnlen... yes
+checking for mbrtowc... (cached) yes
+checking for wcrtomb... (cached) yes
+checking whether _snprintf is declared... no
+checking whether printf supports size specifiers as in C99... yes
+checking whether printf supports 'long double' arguments... yes
+checking whether printf supports infinite 'double' arguments... yes
+checking whether printf supports infinite 'long double' arguments... yes
+checking whether printf supports the 'a' and 'A' directives... yes
+checking whether printf supports the 'F' directive... yes
+checking whether printf supports the 'n' directive... yes
+checking whether printf supports the 'ls' directive... yes
+checking whether printf supports the grouping flag... yes
+checking whether printf supports the left-adjust flag correctly... yes
+checking whether printf supports the zero flag correctly... yes
+checking whether printf supports large precisions... yes
+checking whether printf survives out-of-memory conditions... yes
+checking whether wcwidth is declared... yes
+checking whether wcwidth works reasonably in UTF-8 locales... yes
+checking POSIX termios... yes
+checking whether use of TIOCGWINSZ requires termios.h... no
+checking whether ungetc works on arbitrary bytes... yes
+checking for LC_MESSAGES... yes
+checking for CFPreferencesCopyAppValue... no
+checking for CFLocaleCopyCurrent... no
+checking whether strerror_r is declared... (cached) yes
+checking sys/acl.h usability... no
+checking sys/acl.h presence... no
+checking for sys/acl.h... no
+configure: WARNING: libacl development library was not found or not usable.
+configure: WARNING: GNU coreutils will be built without ACL support.
+checking for alloca as a compiler built-in... yes
+checking whether to enable assertions... yes
+checking whether btowc(0) is correct... yes
+checking whether btowc(EOF) is correct... guessing yes
+checking for strtod_l... yes
+checking for strtold_l... yes
+checking for GNU libc compatible calloc... no
+checking whether this system has an arbitrary file name length limit... yes
+checking for library containing clock_gettime... none required
+checking for clock_gettime... yes
+checking for clock_settime... yes
+checking for closedir... yes
+checking for d_ino member in directory struct... (cached) yes
+checking for d_type member in directory struct... yes
+checking for dirfd... yes
+checking whether dirfd is declared... yes
+checking whether dirfd is a macro... no
+checking whether // is distinct from /... (cached) no
+checking whether dup2 works... yes
+checking for error_at_line... yes
+checking for euidaccess... yes
+checking for fchownat... yes
+checking whether fchownat works with AT_SYMLINK_NOFOLLOW... yes
+checking whether fchownat works with an empty file name... yes
+checking whether fflush works on input streams... (cached) no
+checking whether fcntl handles F_DUPFD correctly... yes
+checking whether fcntl understands F_DUPFD_CLOEXEC... needs runtime check
+checking for library containing fdatasync... none required
+checking whether fdopen sets errno... yes
+checking whether fdopendir is declared... yes
+checking whether fdopendir works... yes
+checking whether fflush works on input streams... (cached) no
+checking for getxattr with XATTR_NAME_POSIX_ACL macros... yes
+checking for struct stat.st_blocks... yes
+checking for flexible array member... yes
+checking whether conversion from 'int' to 'long double' works... yes
+checking for working GNU fnmatch... yes
+checking whether fopen recognizes a trailing slash... yes
+checking for __fpending... yes
+checking whether __fpending is declared... yes
+checking whether fpurge is declared... no
+checking whether frexp works... yes
+checking whether frexpl is declared... yes
+checking whether frexpl() can be used without linking with libm... yes
+checking whether frexpl works... yes
+checking for fseeko... (cached) yes
+checking whether fflush works on input streams... (cached) no
+checking for _fseeki64... no
+checking whether fstatat (..., 0) works... yes
+checking for sys/mount.h... yes
+configure: checking how to get file system space usage
+checking for statvfs function (SVR4)... yes
+checking whether to use statvfs64... no
+checking for two-argument statfs with statfs.f_frsize member... yes
+checking dustat.h usability... no
+checking dustat.h presence... no
+checking for dustat.h... no
+checking sys/fs/s5param.h usability... no
+checking sys/fs/s5param.h presence... no
+checking for sys/fs/s5param.h... no
+checking sys/filsys.h usability... no
+checking sys/filsys.h presence... no
+checking for sys/filsys.h... no
+checking sys/statfs.h usability... yes
+checking sys/statfs.h presence... yes
+checking for sys/statfs.h... yes
+checking for statfs that truncates block counts... no
+checking for ftello... (cached) yes
+checking whether ftello works... (cached) yes
+checking for struct statfs.f_type... yes
+checking whether futimens works... needs runtime check
+configure: checking how to do getaddrinfo, freeaddrinfo and getnameinfo
+checking for library containing getaddrinfo... none required
+checking for getaddrinfo... yes
+checking whether gai_strerror is declared... yes
+checking whether gai_strerrorA is declared... no
+checking for gai_strerror with POSIX signature... yes
+checking for struct sockaddr.sa_len... no
+checking whether getaddrinfo is declared... yes
+checking whether freeaddrinfo is declared... yes
+checking whether getnameinfo is declared... yes
+checking for struct addrinfo... yes
+checking whether getcwd handles long file names properly... yes
+checking for getpagesize... yes
+checking whether getcwd aborts when 4k < cwd_length < 16k... no
+checking for working getdelim function... yes
+checking whether getdtablesize works... yes
+checking for getgroups... yes
+checking for working getgroups... yes
+checking whether getgroups handles negative values... yes
+checking for gethostname... yes
+checking for HOST_NAME_MAX... yes
+checking whether gethrtime is declared... no
+checking whether CLOCK_MONOTONIC or CLOCK_REALTIME is defined... yes
+checking for getline... yes
+checking for working getline function... yes
+checking for getloadavg... yes
+checking sys/loadavg.h usability... no
+checking sys/loadavg.h presence... no
+checking for sys/loadavg.h... no
+checking whether getloadavg is declared... yes
+checking for getpagesize... (cached) yes
+checking whether getpagesize is declared... yes
+checking whether __fsetlocking is declared... yes
+checking whether gettimeofday clobbers localtime buffer... no
+checking for gettimeofday with POSIX signature... yes
+checking whether tzset clobbers localtime buffer... no
+checking whether getusershell is declared... yes
+checking for group_member... yes
+checking host operating system... GNU/Linux
+checking for library containing gethostbyname... (cached) none required
+checking for gethostbyname... (cached) yes
+checking for library containing inet_ntop... (cached) none required
+checking whether inet_ntop is declared... (cached) yes
+checking whether the compiler generally respects inline... yes
+checking whether INT32_MAX < INTMAX_MAX... yes
+checking whether INT64_MAX == LONG_MAX... yes
+checking whether UINT32_MAX < UINTMAX_MAX... yes
+checking whether UINT64_MAX == ULONG_MAX... yes
+checking for isapipe... no
+checking whether pipes are FIFOs (and for their link count)... yes (1)
+checking whether isnan(double) can be used without linking with libm... yes
+checking whether isnan(float) can be used without linking with libm... no
+checking where to find the exponent in a 'float'... (cached) word 0 bit 23
+checking whether isnan(long double) can be used without linking with libm... no
+checking where to find the exponent in a 'long double'... word 2 bit 0
+checking whether iswblank is declared... yes
+checking whether langinfo.h defines CODESET... yes
+checking whether langinfo.h defines T_FMT_AMPM... yes
+checking whether langinfo.h defines ERA... yes
+checking whether langinfo.h defines YESEXPR... yes
+checking for lchown... yes
+checking for C compiler flag to ignore unused libraries... -Wl,--as-needed
+checking whether link obeys POSIX... yes
+checking for __xpg4... no
+checking whether link(2) dereferences a symlink... no
+checking whether linkat() can link symlinks... yes
+checking whether linkat handles trailing slash correctly... yes
+checking whether locale.h conforms to POSIX:2001... yes
+checking whether struct lconv is properly defined... yes
+checking for pthread_rwlock_t... yes
+checking whether lseek detects pipes... yes
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible malloc... (cached) yes
+checking whether NAN macro works... yes
+checking whether HUGE_VAL works... yes
+checking whether mbrtowc handles incomplete characters... (cached) guessing yes
+checking whether mbrtowc works as well as mbtowc... (cached) guessing yes
+checking whether mbrtowc handles a NULL pwc argument... (cached) guessing yes
+checking whether mbrtowc handles a NULL string argument... (cached) guessing yes
+checking whether mbrtowc has a correct return value... (cached) guessing yes
+checking whether mbrtowc returns 0 when parsing a NUL character... (cached) guessing yes
+checking whether mbrtowc works on empty input... (cached) yes
+checking whether mbrtowc handles incomplete characters... (cached) guessing yes
+checking whether mbrtowc works as well as mbtowc... (cached) guessing yes
+checking whether mbrtowc handles incomplete characters... (cached) guessing yes
+checking whether mbrtowc works as well as mbtowc... (cached) guessing yes
+checking whether mbsrtowcs works... guessing yes
+checking whether mbswidth is declared in <wchar.h>... no
+checking for mbstate_t... (cached) yes
+checking for mempcpy... (cached) yes
+checking for memrchr... yes
+checking whether mkdir handles trailing slash... yes
+checking whether mkdir handles trailing dot... yes
+checking whether mkfifo rejects trailing slashes... yes
+checking whether mknod can create fifo without root privileges... yes
+checking for working mkstemp... yes
+checking for working mktime... yes
+checking for listmntent... no
+checking for getmntinfo... no
+checking for sys/ucred.h... no
+checking for sys/mount.h... (cached) yes
+checking mntent.h usability... yes
+checking mntent.h presence... yes
+checking for mntent.h... yes
+checking for sys/fs_types.h... (cached) no
+checking for struct fsstat.f_fstypename... no
+checking for library containing getmntent... none required
+checking for getmntent... yes
+checking for listmntent of Cray/Unicos-9... no
+checking for mntctl function and struct vmount... no
+checking for one-argument getmntent function... yes
+checking for hasmntopt... yes
+checking sys/mntent.h usability... no
+checking sys/mntent.h presence... no
+checking for sys/mntent.h... no
+checking for struct statfs.f_fstypename... no
+checking for library containing nanosleep... none required
+checking for working nanosleep... no (mishandles large arguments)
+checking whether <netinet/in.h> is self-contained... yes
+checking whether YESEXPR works... yes
+checking for sys/pstat.h... no
+checking for sys/sysmp.h... no
+checking for sys/param.h... (cached) yes
+checking for sys/sysctl.h... no
+checking for sched_getaffinity... no
+checking for sched_getaffinity_np... no
+checking for pstat_getdynamic... no
+checking for sysmp... no
+checking for sysctl... (cached) no
+checking for obstacks that work with any size object... no
+checking whether open recognizes a trailing slash... yes
+checking for opendir... yes
+checking for struct tm.tm_zone... yes
+checking for perl5.005 or newer... yes
+checking for sys/pstat.h... (cached) no
+checking for sys/sysmp.h... (cached) no
+checking for sys/sysinfo.h... yes
+checking for machine/hal_sysinfo.h... no
+checking for sys/table.h... no
+checking for sys/param.h... (cached) yes
+checking for sys/systemcfg.h... no
+checking for sys/sysctl.h... (cached) no
+checking for pstat_getstatic... no
+checking for pstat_getdynamic... (cached) no
+checking for sysmp... (cached) no
+checking for getsysinfo... no
+checking for sysctl... (cached) no
+checking for table... no
+checking for sysinfo... (cached) yes
+checking for struct sysinfo.mem_unit... yes
+checking for a shell that conforms to POSIX... /bin/bash
+checking whether frexp works... (cached) yes
+checking whether ldexp can be used without linking with libm... (cached) yes
+checking whether frexpl() can be used without linking with libm... (cached) yes
+checking whether frexpl works... (cached) yes
+checking whether frexpl is declared... (cached) yes
+checking whether ldexpl() can be used without linking with libm... yes
+checking whether ldexpl works... yes
+checking whether ldexpl is declared... yes
+checking for getppriv... no
+checking whether program_invocation_name is declared... yes
+checking whether program_invocation_short_name is declared... yes
+checking whether <pthread.h> pollutes the namespace... no
+checking for pthread_t... yes
+checking for pthread_spinlock_t... yes
+checking for library containing pthread_create and pthread_join... none required
+checking for putenv compatible with GNU and SVID... yes
+checking for raise... yes
+checking for sigprocmask... yes
+checking for readdir... yes
+checking whether readlink signature is correct... yes
+checking whether readlink handles trailing slash correctly... yes
+checking whether readlinkat signature is correct... yes
+checking whether getutent is declared... yes
+checking for struct utmpx.ut_user... yes
+checking for struct utmp.ut_user... yes
+checking for struct utmpx.ut_name... yes
+checking for struct utmp.ut_name... yes
+checking for struct utmpx.ut_type... yes
+checking for struct utmp.ut_type... yes
+checking for struct utmpx.ut_pid... yes
+checking for struct utmp.ut_pid... yes
+checking for struct utmpx.ut_id... yes
+checking for struct utmp.ut_id... yes
+checking for struct utmpx.ut_exit... yes
+checking for struct utmp.ut_exit... yes
+checking for struct utmpx.ut_exit.ut_exit... no
+checking for struct utmp.ut_exit.ut_exit... no
+checking for struct utmpx.ut_exit.e_exit... yes
+checking for struct utmp.ut_exit.e_exit... yes
+checking for struct utmpx.ut_exit.ut_termination... no
+checking for struct utmp.ut_exit.ut_termination... no
+checking for struct utmpx.ut_exit.e_termination... yes
+checking for struct utmp.ut_exit.e_termination... yes
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible realloc... yes
+checking for working re_compile_pattern... yes
+checking whether remove handles directories... yes
+checking whether rename honors trailing slash on destination... yes
+checking whether rename honors trailing slash on source... yes
+checking whether rename manages hard links correctly... yes
+checking whether rename manages existing destinations correctly... yes
+checking for rewinddir... yes
+checking whether rmdir works... (cached) yes
+checking for rpmatch... yes
+checking whether select supports a 0 argument... (cached) yes
+checking whether select detects invalid fds... (cached) yes
+checking selinux/flask.h usability... no
+checking selinux/flask.h presence... no
+checking for selinux/flask.h... no
+checking for selinux/selinux.h... (cached) yes
+checking selinux/context.h usability... yes
+checking selinux/context.h presence... yes
+checking for selinux/context.h... yes
+checking for library containing getservbyname... (cached) none required
+checking for getservbyname... (cached) yes
+checking whether setenv validates arguments... yes
+checking for sig2str... no
+checking for struct sigaction.sa_sigaction... yes
+checking for volatile sig_atomic_t... yes
+checking for sighandler_t... yes
+checking for signbit macro... yes
+checking for signbit compiler built-ins... yes
+checking for sigprocmask... (cached) yes
+checking for stdint.h... (cached) yes
+checking for SIZE_MAX... yes
+checking for smack_new_label_from_self in -lsmack... no
+checking for snprintf... (cached) yes
+checking whether snprintf respects a size of 1... yes
+checking whether printf supports POSIX/XSI format strings with positions... yes
+checking for socklen_t... yes
+checking for ssize_t... (cached) yes
+checking whether stat handles trailing slashes on directories... yes
+checking whether stat handles trailing slashes on files... yes
+checking for struct stat.st_atim.tv_nsec... yes
+checking whether struct stat.st_atim is of type struct timespec... yes
+checking for struct stat.st_birthtimespec.tv_nsec... no
+checking for struct stat.st_birthtimensec... no
+checking for struct stat.st_birthtim.tv_nsec... no
+checking for working stdalign.h... yes
+checking for va_copy... yes
+checking for max_align_t... (cached) yes
+checking whether NULL can be used in arbitrary expressions... (cached) yes
+checking which flavor of printf attribute matches inttypes macros... system
+checking for stpcpy... yes
+checking for working stpncpy... yes
+checking for working strerror function... yes
+checking for working strndup... yes
+checking for working strnlen... yes
+checking for strpbrk... yes
+checking for strsignal... yes
+checking whether strsignal always returns a string... yes
+checking whether strstr works... yes
+checking whether strtod obeys C99... yes
+checking whether strtoimax works... yes
+checking for strtoll... yes
+checking for strtoull... yes
+checking whether symlink handles trailing slash correctly... yes
+checking whether <sys/ioctl.h> declares ioctl... yes
+checking whether <sys/select.h> is self-contained... (cached) yes
+checking for nlink_t... (cached) yes
+checking for struct utsname... yes
+checking whether localtime_r is declared... yes
+checking whether localtime_r is compatible with its POSIX signature... yes
+checking for library containing timer_settime... none required
+checking for timer_settime... yes
+checking for uname... yes
+checking whether unlink honors trailing slashes... (cached) yes
+checking whether unlink of a parent directory fails as it should... (cached) guessing yes
+checking whether a running program can be unlinked... yes
+checking for unsetenv... yes
+checking for unsetenv() return type... int
+checking whether unsetenv obeys POSIX... yes
+checking for /proc/uptime... yes
+checking whether utimensat works... needs runtime check
+checking for ptrdiff_t... yes
+checking for vasprintf... yes
+checking for vasprintf... (cached) yes
+checking whether mbrtowc handles incomplete characters... (cached) guessing yes
+checking whether mbrtowc works as well as mbtowc... (cached) guessing yes
+checking whether wcrtomb return value is correct... guessing yes
+checking whether iswcntrl works... (cached) yes
+checking for towlower... (cached) yes
+checking for wctype_t... (cached) yes
+checking for wctrans_t... (cached) yes
+checking whether wcwidth is declared... (cached) yes
+checking whether wcwidth works reasonably in UTF-8 locales... (cached) yes
+checking whether use of TIOCGWINSZ requires sys/ioctl.h... yes
+checking whether use of TIOCGWINSZ requires termios.h... (cached) no
+checking whether use of struct winsize requires sys/ptem.h... no
+checking for stdint.h... (cached) yes
+checking for a traditional french locale... (cached) none
+checking for a french Unicode locale... (cached) none
+checking for a traditional french locale... (cached) none
+checking for a turkish Unicode locale... none
+checking whether byte ordering is bigendian... (cached) no
+checking for library containing inet_pton... none required
+checking whether inet_pton is declared... yes
+checking whether byte ordering is bigendian... (cached) no
+checking for ioctl... yes
+checking for ioctl with POSIX signature... no
+checking where to find the exponent in a 'double'... (cached) word 1 bit 20
+checking where to find the exponent in a 'float'... (cached) word 0 bit 23
+checking where to find the exponent in a 'long double'... (cached) word 2 bit 0
+checking for setlocale... yes
+checking for uselocale... yes
+checking for a traditional french locale... (cached) none
+checking for a french Unicode locale... (cached) none
+checking for a traditional japanese locale... (cached) none
+checking for a transitional chinese locale... (cached) none
+checking for a turkish Unicode locale... (cached) none
+checking for a french Unicode locale... (cached) none
+checking for a traditional french locale... (cached) none
+checking for a french Unicode locale... (cached) none
+checking for a traditional japanese locale... (cached) none
+checking for a transitional chinese locale... (cached) none
+checking for a french Unicode locale... (cached) none
+checking for a transitional chinese locale... (cached) none
+checking for mmap... (cached) yes
+checking for MAP_ANONYMOUS... yes
+checking for mmap... (cached) yes
+checking for MAP_ANONYMOUS... yes
+checking for mmap... (cached) yes
+checking for MAP_ANONYMOUS... yes
+checking for mmap... (cached) yes
+checking for MAP_ANONYMOUS... yes
+checking for a traditional french locale... (cached) none
+checking for a french Unicode locale... (cached) none
+checking whether perror matches strerror... yes
+checking for mmap... (cached) yes
+checking for MAP_ANONYMOUS... yes
+checking for a traditional french locale... (cached) none
+checking for a french Unicode locale... (cached) none
+checking for a traditional japanese locale... (cached) none
+checking for a transitional chinese locale... (cached) none
+checking whether sleep is declared... yes
+checking for working sleep... yes
+checking for mmap... (cached) yes
+checking for MAP_ANONYMOUS... yes
+checking for mmap... (cached) yes
+checking for MAP_ANONYMOUS... yes
+checking whether symlinkat handles trailing slash correctly... yes
+checking for pthread_atfork... yes
+checking for a traditional french locale... (cached) none
+checking for a french Unicode locale... (cached) none
+checking for a traditional japanese locale... (cached) none
+checking for a transitional chinese locale... (cached) none
+checking whether wctob works... guessing yes
+checking whether wctob is declared... yes
+checking for sched_yield in -lrt... no
+checking for sched_yield in -lposix4... no
+checking for library containing strerror... none required
+checking for working volatile... yes
+checking for sys/sysctl.h... (cached) no
+checking whether sys/types.h defines makedev... yes
+checking whether time.h and sys/time.h may both be included... yes
+checking whether geteuid is declared... yes
+checking whether getlogin is declared... yes
+checking whether getuid is declared... yes
+checking whether getgrgid is declared... yes
+checking whether getpwuid is declared... yes
+checking whether ttyname is declared... yes
+checking whether setregid is declared... yes
+checking attr/error_context.h usability... no
+checking attr/error_context.h presence... no
+checking for attr/error_context.h... no
+checking attr/libattr.h usability... no
+checking attr/libattr.h presence... no
+checking for attr/libattr.h... no
+configure: WARNING: libattr development library was not found or not usable.
+configure: WARNING: GNU coreutils will be built without xattr support.
+checking for struct stat.st_author... no
+checking for ino_t... yes
+checking for major_t... no
+checking for minor_t... no
+checking for mode_to_security_class... yes
+checking for matchpathcon_init_prefix... yes
+checking for inotify_init... yes
+checking nfs/vfs.h usability... no
+checking nfs/vfs.h presence... no
+checking for nfs/vfs.h... no
+checking for struct statvfs.f_basetype... no
+checking for struct statvfs.f_fstypename... no
+checking for struct statvfs.f_type... no
+checking for struct statfs.f_namelen... yes
+checking for struct statfs.f_type... (cached) yes
+checking for struct statfs.f_frsize... yes
+checking for library containing fdatasync... (cached) none required
+checking for fdatasync... yes
+checking for cap_get_file in -lcap... no
+configure: WARNING: libcap library was not found or not usable.
+configure: WARNING: GNU coreutils will be built without capability support.
+checking vfork.h usability... no
+checking vfork.h presence... no
+checking for vfork.h... no
+checking for fork... yes
+checking for vfork... yes
+checking for working fork... yes
+checking for working vfork... (cached) yes
+checking for chroot... yes
+checking for gethostid... yes
+checking whether use of struct winsize requires sys/ptem.h... (cached) no
+checking whether localtime caches TZ... no
+checking for getattrat... no
+checking for initgroups... yes
+checking for syslog... yes
+checking for 3-argument setpriority function... yes
+checking ut_host in struct utmp... yes
+checking for sysctl... (cached) no
+checking for sys/sysctl.h... (cached) no
+checking whether we can get the system boot time... yes
+checking POSIX termios... (cached) yes
+checking whether use of TIOCGWINSZ requires sys/ioctl.h... (cached) yes
+checking whether termios.h needs _XOPEN_SOURCE... no
+checking c_line in struct termios... yes
+checking whether use of struct winsize requires sys/ptem.h... (cached) no
+checking whether use of TIOCGWINSZ requires termios.h... (cached) no
+checking whether strsignal is declared... (cached) yes
+checking whether sys_siglist is declared... (cached) no
+checking whether _sys_siglist is declared... no
+checking whether __sys_siglist is declared... no
+configure: WARNING: libgmp development library was not found or not usable.
+configure: WARNING: GNU coreutils will be built without GMP support.
+checking whether C compiler handles -Werror... yes
+checking whether C compiler handles -errwarn... yes
+checking whether this system supports stdbuf... yes
+checking whether NLS is requested... no
+checking for msgfmt... no
+checking for gmsgfmt... :
+checking for xgettext... no
+checking for msgmerge... no
+checking for CFPreferencesCopyAppValue... (cached) no
+checking for CFLocaleCopyCurrent... (cached) no
+checking whether to use NLS... no
+checking for a traditional french locale... (cached) none
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating po/Makefile.in
+config.status: creating gnulib-tests/Makefile
+config.status: creating lib/config.h
+config.status: executing depfiles commands
+config.status: executing po-directories commands
+config.status: creating po/POTFILES
+config.status: creating po/Makefile
+configure: WARNING: unrecognized options: --disable-man
+[LAVA-M] Building md5sum ...
+make -C targets/lava_m/md5sum/coreutils-8.24-lava-safe -j12 \
+          HELP2MAN=true \
+          man1_MANS= \
+          EXTRA_MANS=
+make[1]: Entering directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+ cd . && /bin/bash /home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/build-aux/missing automake-1.15 --gnu
+  GEN      lib/alloca.h
+  GEN      lib/configmake.h
+  GEN      lib/ctype.h
+  GEN      lib/arpa/inet.h
+  GEN      lib/dirent.h
+gperf -m 10 ./lib/iconv_open-hpux.gperf > ./lib/iconv_open-hpux.h-t
+  GEN      lib/fcntl.h
+gperf -m 10 ./lib/iconv_open-osf.gperf > ./lib/iconv_open-osf.h-t
+  GEN      lib/iconv.h
+gperf -m 10 ./lib/iconv_open-solaris.gperf > ./lib/iconv_open-solaris.h-t
+  GEN      lib/inttypes.h
+  GEN      lib/langinfo.h
+  GEN      lib/locale.h
+  GEN      lib/math.h
+mv ./lib/iconv_open-solaris.h-t ./lib/iconv_open-solaris.h
+  GEN      lib/netdb.h
+mv ./lib/iconv_open-osf.h-t ./lib/iconv_open-osf.h
+  GEN      lib/signal.h
+mv ./lib/iconv_open-hpux.h-t ./lib/iconv_open-hpux.h
+  GEN      lib/stdio.h
+  GEN      lib/stdlib.h
+  GEN      lib/selinux/selinux.h
+  GEN      lib/string.h
+  GEN      lib/sys/ioctl.h
+  GEN      lib/sys/resource.h
+  GEN      lib/sys/select.h
+  GEN      lib/sys/stat.h
+  GEN      lib/sys/time.h
+  GEN      lib/sys/socket.h
+  GEN      lib/sys/types.h
+  GEN      lib/sys/uio.h
+  GEN      lib/termios.h
+  GEN      lib/sys/utsname.h
+  GEN      lib/sys/wait.h
+  GEN      lib/time.h
+  GEN      lib/unistd.h
+  GEN      lib/wchar.h
+  GEN      lib/wctype.h
+  GEN      src/coreutils.h
+  GEN      src/dircolors.h
+  GEN      src/version.c
+  GEN      src/version.h
+make  all-recursive
+make[2]: Entering directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+ cd . && /bin/bash /home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/build-aux/missing automake-1.15 --gnu
+Making all in po
+make[3]: Entering directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/po'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/po'
+Making all in .
+make[3]: Entering directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+ cd . && /bin/bash /home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/build-aux/missing automake-1.15 --gnu
+  CC       src/ls-dir.o
+  CC       src/ls-ls.o
+  CC       src/src_md5sum-md5sum.o
+  CC       src/mkdir.o
+  CC       src/prog-fprintf.o
+  CC       src/mkfifo.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/mknod.o
+  CC       src/mktemp.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/mv.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/remove.o
+  CC       src/nl.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+make[4]: Entering directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+  CC       src/nproc.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/nohup.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/numfmt.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+ cd . && /bin/bash /home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/build-aux/missing automake-1.15 --gnu
+  CC       src/od.o
+make[4]: Leaving directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/paste.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/pathchk.o
+  CC       src/pr.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+Updating ./doc/version.texi
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/printenv.o
+  CC       src/printf.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/pwd.o
+  CC       src/ptx.o
+  CC       src/readlink.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/realpath.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/rm.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/rmdir.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/runcon.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/seq.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/src_sha1sum-md5sum.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/src_sha224sum-md5sum.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/src_sha256sum-md5sum.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/src_sha512sum-md5sum.o
+  CC       src/src_sha384sum-md5sum.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/shred.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/shuf.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/sleep.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/sort.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/split.o
+  CC       src/stat.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+src/sort.c:1401:21: warning: implicit conversion from 'unsigned long' to 'double' changes value from 18446744073709551615 to 18446744073709551616 [-Wimplicit-const-int-float-conversion]
+          if (mem < UINTMAX_MAX)
+                  ~ ^~~~~~~~~~~
+/usr/include/stdint.h:202:24: note: expanded from macro 'UINTMAX_MAX'
+# define UINTMAX_MAX            (__UINT64_C(18446744073709551615))
+                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/stdint.h:107:25: note: expanded from macro '__UINT64_C'
+#  define __UINT64_C(c) c ## UL
+                        ^~~~~~~
+<scratch space>:157:1: note: expanded from here
+18446744073709551615UL
+^~~~~~~~~~~~~~~~~~~~~~
+  CC       src/sum.o
+  CC       src/sync.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/tac.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/tail.o
+  CC       src/tee.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/test.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/timeout.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/touch.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/tr.o
+  CC       src/true.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/truncate.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/tsort.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/tty.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/uname.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/uname-uname.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/unexpand.o
+  CC       src/uniq.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/unlink.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/ls-vdir.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/wc.o
+  CC       src/whoami.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/yes.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/getlimits.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/make-prime-list.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/src_libstdbuf_so-libstdbuf.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  GEN      lib/charset.alias
+  GEN      lib/ref-add.sed
+  GEN      lib/ref-del.sed
+  CC       lib/copy-acl.o
+  CC       lib/set-acl.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/acl-errno-valid.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/acl-internal.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/get-permissions.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/set-permissions.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/allocator.o
+  CC       lib/areadlink.o
+  CC       lib/areadlink-with-size.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/areadlinkat.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/argmatch.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/argv-iter.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/backupfile.o
+  CC       lib/base64.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/bitrotate.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/buffer-lcm.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/c-ctype.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/c-strcasecmp.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/c-strncasecmp.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/c-strtod.o
+  CC       lib/c-strtold.o
+  CC       lib/canon-host.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/canonicalize.o
+  CC       lib/careadlinkat.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/cloexec.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/close-stream.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/closein.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/closeout.o
+  CC       lib/md5.o
+  CC       lib/sha1.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/sha256.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/sha512.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/cycle-check.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/di-set.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/diacrit.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/opendir-safer.o
+  CC       lib/dirname.o
+  CC       lib/basename.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/dirname-lgpl.o
+  CC       lib/basename-lgpl.o
+  CC       lib/stripslash.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/dtoastr.o
+  CC       lib/dtotimespec.o
+  CC       lib/exclude.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/exitfail.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/chmodat.o
+  CC       lib/fadvise.o
+lib/dtotimespec.c:34:7: warning: implicit conversion from 'time_t' (aka 'long') to 'double' changes value from 9223372036854775807 to 9223372036854775808 [-Wimplicit-const-int-float-conversion]
+    ((TYPE_MAXIMUM (time_t) * (double) TIMESPEC_RESOLUTION
+      ^~~~~~~~~~~~~~~~~~~~~ ~
+./lib/intprops.h:72:4: note: expanded from macro 'TYPE_MAXIMUM'
+  ((t) (! TYPE_SIGNED (t)                                               \
+   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+1 warning generated.
+  CC       lib/creat-safer.o
+  CC       lib/chownat.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/open-safer.o
+  CC       lib/fd-hook.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/fd-reopen.o
+  CC       lib/fd-safer-flag.o
+  CC       lib/dup-safer-flag.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/fdutimensat.o
+  CC       lib/file-has-acl.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/file-set.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/file-type.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/filemode.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/filenamecat.o
+  CC       lib/filenamecat-lgpl.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/filevercmp.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/fopen-safer.o
+  CC       lib/fprintftime.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/freading.o
+  CC       lib/freadseek.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/freopen-safer.o
+  CC       lib/ftoastr.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/full-read.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/full-write.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/gethrxtime.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xtime.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/getndelim2.o
+  CC       lib/gettime.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/getugroups.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/hard-locale.o
+  CC       lib/hash.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/hash-pjw.o
+1 warning generated.
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/heap.o
+  CC       lib/hash-triple.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/human.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/i-ring.o
+lib/hash.c:549:11: warning: implicit conversion from 'unsigned long' to 'float' changes value from 18446744073709551615 to 18446744073709551616 [-Wimplicit-const-int-float-conversion]
+      if (SIZE_MAX <= new_candidate)
+          ^~~~~~~~ ~~
+/usr/include/stdint.h:227:22: note: expanded from macro 'SIZE_MAX'
+#  define SIZE_MAX              (18446744073709551615UL)
+                                 ^~~~~~~~~~~~~~~~~~~~~~
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/idcache.o
+lib/hash.c:1079:15: warning: implicit conversion from 'unsigned long' to 'float' changes value from 18446744073709551615 to 18446744073709551616 [-Wimplicit-const-int-float-conversion]
+          if (SIZE_MAX <= candidate)
+              ^~~~~~~~ ~~
+/usr/include/stdint.h:227:22: note: expanded from macro 'SIZE_MAX'
+#  define SIZE_MAX              (18446744073709551615UL)
+                                 ^~~~~~~~~~~~~~~~~~~~~~
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/ino-map.o
+  CC       lib/imaxtostr.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/inttostr.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/offtostr.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/uinttostr.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/umaxtostr.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/ldtoastr.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/linebuffer.o
+  CC       lib/gl_linked_list.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/gl_list.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/localcharset.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/glthread/lock.o
+  CC       lib/long-options.o
+  CC       lib/malloca.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/math.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+2 warnings generated.
+  CC       lib/mbchar.o
+  CC       lib/mbiter.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/mbsalign.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/mbscasecmp.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/mbslen.o
+  CC       lib/mbsstr.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/mbswidth.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/mbuiter.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/memcasecmp.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/memchr2.o
+  CC       lib/memcmp2.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/memcoll.o
+  CC       lib/mgetgroups.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/mkancesdirs.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/dirchownmod.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/mkdir-p.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/modechange.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/mpsort.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/nproc.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/openat-die.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/openat-safer.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/parse-datetime.o
+  CC       lib/physmem.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/posixtm.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/posixver.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/printf-frexp.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/printf-frexpl.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/priv-set.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/progname.o
+  CC       lib/propername.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/qcopy-acl.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/qset-acl.o
+  CC       lib/quotearg.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/randint.o
+./lib/parse-datetime.y:876:17: warning: absolute value function 'abs' given an argument of type 'long' but has parameter of type 'int' which may cause truncation of value [-Wabsolute-value]
+  if (24 * 60 < abs (n_minutes))
+                ^
+./lib/parse-datetime.y:876:17: note: use function 'labs' instead
+  if (24 * 60 < abs (n_minutes))
+                ^~~
+                labs
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/randperm.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/randread.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/read-file.o
+  CC       lib/rand-isaac.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/readtokens.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/readtokens0.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/root-dev-ino.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/safe-read.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/safe-write.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/same.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/save-cwd.o
+  CC       lib/savedir.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/savewd.o
+  CC       lib/se-context.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/se-selinux.o
+  CC       lib/settime.o
+  CC       lib/sig-handler.o
+  CC       lib/sockets.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/stat-time.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/statat.o
+  CC       lib/mkstemp-safer.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/strftime.o
+  CC       lib/striconv.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/strnlen1.o
+  CC       lib/strintcmp.o
+  CC       lib/strnumcmp.o
+  CC       lib/sys_socket.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/tempname.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/glthread/threadlib.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/timespec.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/glthread/tls.o
+  CC       lib/trim.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/u64.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/unicodeio.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/unistd.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/dup-safer.o
+  CC       lib/fd-safer.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/pipe-safer.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/unistr/u8-mbtoucr.o
+  CC       lib/unistr/u8-uctomb.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/unistr/u8-uctomb-aux.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/uniwidth/width.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/userspec.o
+  CC       lib/utimecmp.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/utimens.o
+  CC       lib/verror.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/version-etc.o
+  CC       lib/version-etc-fsf.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/wctype-h.o
+  CC       lib/write-any-file.o
+  CC       lib/xmalloc.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xalloc-die.o
+  CC       lib/xdectoimax.o
+1 warning generated.
+  CC       lib/xdectoumax.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xfreopen.o
+  CC       lib/xfts.o
+  CC       lib/xgetcwd.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xgetgroups.o
+  CC       lib/xgethostname.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/gl_xlist.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xmemcoll.o
+  CC       lib/xnanosleep.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xprintf.o
+  CC       lib/xsize.o
+  CC       lib/xreadlink.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xstriconv.o
+  CC       lib/xstrndup.o
+  CC       lib/xstrtod.o
+  CC       lib/xstrtoimax.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xstrtol.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xstrtoul.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xstrtol-error.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xstrtold.o
+  CC       lib/xstrtoumax.o
+  CC       lib/xvasprintf.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/xasprintf.o
+  CC       lib/yesno.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/asnprintf.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/calloc.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/chdir-long.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/fclose.o
+  CC       lib/fcntl.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/fflush.o
+  CC       lib/fpurge.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/freadptr.o
+  CC       lib/freadahead.o
+  CC       lib/fseek.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/fseeko.o
+  CC       lib/fseterr.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/fsusage.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/fts.o
+  CC       lib/futimens.o
+  CC       lib/getfilecon.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/getpass.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/isapipe.o
+  CC       lib/isnanf.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/isnanl.o
+  CC       lib/mountlist.o
+  CC       lib/nanosleep.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/obstack.o
+  CC       lib/openat-proc.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+lib/getfilecon.c:36:35: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+int getfilecon (char const *file, security_context_t *con);
+                                  ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+lib/getfilecon.c:37:36: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+int lgetfilecon (char const *file, security_context_t *con);
+                                   ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+lib/getfilecon.c:38:26: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+int fgetfilecon (int fd, security_context_t *con);
+                         ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+lib/getfilecon.c:49:26: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+map_to_failure (int ret, security_context_t *con)
+                         ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+lib/getfilecon.c:69:35: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+rpl_getfilecon (char const *file, security_context_t *con)
+                                  ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+lib/getfilecon.c:76:36: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+rpl_lgetfilecon (char const *file, security_context_t *con)
+                                   ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+lib/getfilecon.c:83:26: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+rpl_fgetfilecon (int fd, security_context_t *con)
+                         ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+  CC       lib/printf-args.o
+  CC       lib/printf-parse.o
+7 warnings generated.
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/readutmp.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/selinux-at.o
+  CC       lib/sig2str.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/utimensat.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       lib/vasnprintf.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/version.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/chroot.o
+In file included from lib/selinux-at.c:21:
+./lib/selinux-at.h:34:50: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+int  getfileconat (int dir_fd, char const *file, security_context_t *con);
+                                                 ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+In file included from lib/selinux-at.c:21:
+./lib/selinux-at.h:39:50: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+int lgetfileconat (int dir_fd, char const *file, security_context_t *con);
+                                                 ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+In file included from lib/selinux-at.c:21:
+./lib/selinux-at.h:45:50: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+int  setfileconat (int dir_fd, char const *file, security_context_t con);
+                                                 ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+In file included from lib/selinux-at.c:21:
+./lib/selinux-at.h:52:50: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+int lsetfileconat (int dir_fd, char const *file, security_context_t con);
+                                                 ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/hostid.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+In file included from lib/selinux-at.c:37:
+./lib/at-func.copy1.c:70:40: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+AT_FUNC_NAME (int fd, char const *file AT_FUNC_POST_FILE_PARAM_DECLS)
+                                       ^
+lib/selinux-at.c:35:41: note: expanded from macro 'AT_FUNC_POST_FILE_PARAM_DECLS'
+#define AT_FUNC_POST_FILE_PARAM_DECLS , security_context_t *con
+                                        ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+  CC       src/nice.o
+  CC       src/who.o
+In file included from lib/selinux-at.c:47:
+./lib/at-func.copy2.c:70:40: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+AT_FUNC_NAME (int fd, char const *file AT_FUNC_POST_FILE_PARAM_DECLS)
+                                       ^
+lib/selinux-at.c:45:41: note: expanded from macro 'AT_FUNC_POST_FILE_PARAM_DECLS'
+#define AT_FUNC_POST_FILE_PARAM_DECLS , security_context_t *con
+                                        ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+In file included from lib/selinux-at.c:57:
+./lib/at-func.copy3.c:70:40: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+AT_FUNC_NAME (int fd, char const *file AT_FUNC_POST_FILE_PARAM_DECLS)
+                                       ^
+lib/selinux-at.c:55:41: note: expanded from macro 'AT_FUNC_POST_FILE_PARAM_DECLS'
+#define AT_FUNC_POST_FILE_PARAM_DECLS , security_context_t con
+                                        ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+In file included from lib/selinux-at.c:67:
+./lib/at-func.copy4.c:70:40: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+AT_FUNC_NAME (int fd, char const *file AT_FUNC_POST_FILE_PARAM_DECLS)
+                                       ^
+lib/selinux-at.c:65:41: note: expanded from macro 'AT_FUNC_POST_FILE_PARAM_DECLS'
+#define AT_FUNC_POST_FILE_PARAM_DECLS , security_context_t con
+                                        ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+  CC       src/users.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/pinky.o
+  CC       src/uptime.o
+  CC       src/stty.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+8 warnings generated.
+  CC       src/df.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/find-mount-point.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/stdbuf.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+src/uptime.c:80:47: warning: implicit conversion from 'time_t' (aka 'long') to 'double' changes value from 9223372036854775807 to 9223372036854775808 [-Wimplicit-const-int-float-conversion]
+            uptime = (0 <= upsecs && upsecs < TYPE_MAXIMUM (time_t)
+                                            ~ ^~~~~~~~~~~~~~~~~~~~~
+./lib/intprops.h:72:4: note: expanded from macro 'TYPE_MAXIMUM'
+  ((t) (! TYPE_SIGNED (t)                                               \
+   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  CC       src/lbracket.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/base64.o
+  CC       src/basename.o
+1 warning generated.
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/cat.o
+  CC       src/chcon.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/chgrp.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/chown-core.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/chmod.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/chown.o
+In file included from src/chcon.c:34:
+./lib/selinux-at.h:34:50: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+int  getfileconat (int dir_fd, char const *file, security_context_t *con);
+                                                 ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+In file included from src/chcon.c:34:
+./lib/selinux-at.h:39:50: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+int lgetfileconat (int dir_fd, char const *file, security_context_t *con);
+                                                 ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+In file included from src/chcon.c:34:
+./lib/selinux-at.h:45:50: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+int  setfileconat (int dir_fd, char const *file, security_context_t con);
+                                                 ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+In file included from src/chcon.c:34:
+./lib/selinux-at.h:52:50: warning: 'security_context_t' is deprecated [-Wdeprecated-declarations]
+int lsetfileconat (int dir_fd, char const *file, security_context_t con);
+                                                 ^
+/usr/include/selinux/selinux.h:19:17: note: 'security_context_t' has been explicitly marked deprecated here
+__attribute__ ((deprecated))
+                ^
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/cksum.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/comm.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/cp.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/copy.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/cp-hash.o
+  CC       src/extent-scan.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/selinux.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/csplit.o
+4afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+ warnings generated.
+  CC       src/cut.o
+  CC       src/date.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/dd.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/ls.o
+src/selinux.c:132:7: warning: 'matchpathcon' is deprecated: Use selabel_lookup instead [-Wdeprecated-declarations]
+  if (matchpathcon (path, mode, &scon) < 0)
+      ^
+/usr/include/selinux/selinux.h:505:18: note: 'matchpathcon' has been explicitly marked deprecated here
+        __attribute__ ((deprecated("Use selabel_lookup instead")))
+                        ^
+src/selinux.c:222:7: warning: 'matchpathcon' is deprecated: Use selabel_lookup instead [-Wdeprecated-declarations]
+  if (matchpathcon (path, sb.st_mode, &scon) < 0)
+      ^
+/usr/include/selinux/selinux.h:505:18: note: 'matchpathcon' has been explicitly marked deprecated here
+        __attribute__ ((deprecated("Use selabel_lookup instead")))
+                        ^
+  CC       src/dircolors.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/dirname.o
+  CC       src/du.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+2 warnings generated.
+  CC       src/echo.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/env.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/expand.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/expr.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/factor.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/false.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/fold.o
+  CC       src/fmt.o
+  CC       src/src_ginstall-install.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/src_ginstall-prog-fprintf.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+src/install.c:371:8: warning: 'matchpathcon' is deprecated: Use selabel_lookup instead [-Wdeprecated-declarations]
+  if ((matchpathcon (file, st.st_mode, &scontext) != 0)
+       ^
+/usr/include/selinux/selinux.h:505:18: note: 'matchpathcon' has been explicitly marked deprecated here
+        __attribute__ ((deprecated("Use selabel_lookup instead")))
+                        ^
+  CC       src/src_ginstall-copy.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/src_ginstall-cp-hash.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/src_ginstall-extent-scan.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/src_ginstall-selinux.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/groups.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/group-list.o
+  CC       src/head.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/id.o
+1 warning generated.
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/join.o
+src/selinux.c:132:7: warning: 'matchpathcon' is deprecated: Use selabel_lookup instead [-Wdeprecated-declarations]
+  if (matchpathcon (path, mode, &scon) < 0)
+      ^
+/usr/include/selinux/selinux.h:505:18: note: 'matchpathcon' has been explicitly marked deprecated here
+        __attribute__ ((deprecated("Use selabel_lookup instead")))
+                        ^
+src/selinux.c:222:7: warning: 'matchpathcon' is deprecated: Use selabel_lookup instead [-Wdeprecated-declarations]
+  if (matchpathcon (path, sb.st_mode, &scon) < 0)
+      ^
+/usr/include/selinux/selinux.h:505:18: note: 'matchpathcon' has been explicitly marked deprecated here
+        __attribute__ ((deprecated("Use selabel_lookup instead")))
+                        ^
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/kill.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+2 warnings generated.
+  CC       src/operand2sig.o
+  CC       src/link.o
+  CC       src/ln.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/relpath.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CC       src/logname.o
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/make-prime-list
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/libstdbuf.so
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  AR       lib/libcoreutils.a
+  AR       src/libver.a
+  CCLD     src/chroot
+  CCLD     src/hostid
+  CCLD     src/nice
+  CCLD     src/who
+  CCLD     src/users
+  CCLD     src/pinky
+  CCLD     src/uptime
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/stty
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/df
+  CCLD     src/stdbuf
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/[
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/base64
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/cat
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/basename
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/chcon
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/chgrp
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/chmod
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/chown
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/cksum
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/comm
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/cp
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/csplit
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/cut
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/date
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/dd
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/dircolors
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/dirname
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/du
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/echo
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/env
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/expand
+  CCLD     src/expr
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/factor
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/false
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/fmt
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/fold
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/ginstall
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/groups
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/head
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/id
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/kill
+  CCLD     src/join
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/link
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/ln
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/logname
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/mkdir
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/md5sum
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/mkfifo
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/mknod
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/mktemp
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/mv
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/nl
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/nproc
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/numfmt
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/nohup
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/od
+  CCLD     src/paste
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/pathchk
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/pr
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/printenv
+  CCLD     src/printf
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/ptx
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/pwd
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/readlink
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/realpath
+  CCLD     src/rm
+  CCLD     src/rmdir
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/runcon
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/seq
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/sha1sum
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/sha224sum
+  CCLD     src/sha256sum
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/sha384sum
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/sha512sum
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/shred
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/shuf
+  CCLD     src/sleep
+  CCLD     src/sort
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/split
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/stat
+  CCLD     src/sum
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/sync
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/tail
+  CCLD     src/tac
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/tee
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/test
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/timeout
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/touch
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/tr
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/truncate
+  CCLD     src/true
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/tsort
+  CCLD     src/tty
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/uname
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/unexpand
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/uniq
+  CCLD     src/unlink
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/vdir
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/wc
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/whoami
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/yes
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/getlimits
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/dir
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+  CCLD     src/ls
+afl-cc++4.08c by Michal Zalewski, Laszlo Szekeres, Marc Heuse - mode: LLVM-CLASSIC
+make[3]: Leaving directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+Making all in gnulib-tests
+make[3]: Entering directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/gnulib-tests'
+make[4]: Entering directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+ cd . && /bin/bash /home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/build-aux/missing automake-1.15 --gnu
+make[4]: Leaving directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+  GEN      arg-nonnull.h
+  GEN      c++defs.h
+  GEN      unused-parameter.h
+  GEN      warn-on-use.h
+make  all-recursive
+make[4]: Entering directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/gnulib-tests'
+make[5]: Entering directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+ cd . && /bin/bash /home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/build-aux/missing automake-1.15 --gnu
+make[5]: Leaving directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+Making all in .
+make[5]: Entering directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/gnulib-tests'
+make[6]: Entering directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+ cd . && /bin/bash /home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/build-aux/missing automake-1.15 --gnu
+make[6]: Leaving directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+make[5]: Nothing to be done for 'all-am'.
+make[5]: Leaving directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/gnulib-tests'
+make[4]: Leaving directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/gnulib-tests'
+make[3]: Leaving directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe/gnulib-tests'
+make[2]: Leaving directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+make[1]: Leaving directory '/home/captainalan2/Research/adaptive-fuzzer/targets/lava_m/md5sum/coreutils-8.24-lava-safe'
+cp targets/lava_m/md5sum/coreutils-8.24-lava-safe/src/md5sum build/native/fuzzer_md5sum
+[LAVA-M] Staged build/native/fuzzer_md5sum
