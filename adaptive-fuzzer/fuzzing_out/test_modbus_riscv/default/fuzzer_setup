@@ -1,0 +1,7 @@
+# environment variables:
+AFL_CUSTOM_INFO_PROGRAM=qemu-riscv64-static
+AFL_CUSTOM_INFO_PROGRAM_ARGV=./build/riscv/fuzzer_modbus_riscv
+AFL_CUSTOM_INFO_OUT=fuzzing_out/test_modbus_riscv/default
+AFL_SKIP_CPUFREQ=1
+# command line:
+'afl-fuzz' '-Q' '-i' 'corpus/modbus_seeds' '-o' 'fuzzing_out/test_modbus_riscv' '--' 'qemu-riscv64-static' './build/riscv/fuzzer_modbus_riscv'

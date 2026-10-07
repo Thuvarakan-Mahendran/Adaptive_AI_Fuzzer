@@ -1,0 +1,2 @@
+qemu-riscv64-static
+./build/riscv/fuzzer_modbus_riscv
