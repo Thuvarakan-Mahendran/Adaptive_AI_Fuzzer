@@ -1,50 +1,57 @@
 # =============================================================================
 # c_mutator/Makefile – AFL++ custom mutator shared library + unit test binary
 #
-# Standalone Makefile (not merged into the top-level adaptive-fuzzer/Makefile).
+# Standalone Makefile linking against decoupled ipc_bridge.
 #
 # Targets:
 #   all           Build libmutator.so and test_agg (default)
-#   libmutator.so AFL++ custom mutator shared library
+#   libmutator.so AFL++ custom mutator shared library (links socket_client.o)
 #   test_agg      Aggregator unit test binary (does not link against libmutator)
 #   clean         Remove all build artefacts
 #
-# Compiler: clang-14 (matches the LLVM-14 toolchain used in the rest of the
-#           project).  libmutator.so MUST NOT be compiled with afl-clang-fast
-#           because the shared library is loaded by AFL++ itself, not instrumented.
-#
-# AFL++ headers: pinned to ../../AFLplusplus/include (relative to this file).
-#   Key headers pulled in transitively by mutator.h → afl-fuzz.h:
-#     types.h, config.h, forkserver.h, alloc-inl.h, debug.h, hash.h
+# Compiler: clang-14 (matches LLVM-14 toolchain).
 # =============================================================================
 
 CC      := clang-14
-CFLAGS  := -O3 -fPIC -Wall -Wextra -I../../AFLplusplus/include
+IPC_DIR := ../ipc_bridge
+
+CFLAGS  := -O3 -fPIC -Wall -Wextra \
+           -I../../AFLplusplus/include \
+           -I$(IPC_DIR)/common \
+           -I$(IPC_DIR)/client_c
+
 LDFLAGS := -shared -lm
 
 # Source files for the shared library
 LIB_SRCS := aggregator.c operators.c mutator.c
 LIB_OBJS := $(LIB_SRCS:.c=.o)
+IPC_OBJ  := $(IPC_DIR)/client_c/socket_client.o
 
 # Default target
 .PHONY: all
 all: libmutator.so test_agg
 
 # -----------------------------------------------------------------------------
+# IPC Bridge Client Object Dependency
+# -----------------------------------------------------------------------------
+$(IPC_OBJ):
+	$(MAKE) -C $(IPC_DIR) client_c/socket_client.o
+
+# -----------------------------------------------------------------------------
 # Shared library
 # -----------------------------------------------------------------------------
-libmutator.so: $(LIB_OBJS)
+libmutator.so: $(LIB_OBJS) $(IPC_OBJ)
 	$(CC) $(LDFLAGS) -o $@ $^
 	@echo "[c_mutator] Built $@ ($(shell wc -c < $@) bytes)"
 
 # Object files – explicit prerequisites to track header changes
-aggregator.o: aggregator.c aggregator.h protocol.h
+aggregator.o: aggregator.c aggregator.h protocol.h $(IPC_DIR)/common/protocol.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 operators.o: operators.c operators.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-mutator.o: mutator.c mutator.h protocol.h aggregator.h operators.h
+mutator.o: mutator.c mutator.h protocol.h aggregator.h operators.h $(IPC_DIR)/client_c/socket_client.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # -----------------------------------------------------------------------------
