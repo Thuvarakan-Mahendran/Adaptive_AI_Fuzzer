@@ -76,6 +76,30 @@ int ipc_client_send_seed_query(ipc_client_t *client, const struct seed_query_msg
 int ipc_client_recv_seed_verd(ipc_client_t *client, struct seed_verdict_msg *verd);
 
 /**
+ * ipc_client_send_trace_submit – Transmit a MSG_TRACE_SUBMIT datagram to the server.
+ * Uses MSG_NOSIGNAL to prevent SIGPIPE.
+ *
+ * @return 1 on success, 0 on failure.
+ */
+int ipc_client_send_trace_submit(ipc_client_t *client, const struct trace_submit_msg *msg);
+
+/**
+ * ipc_client_recv_trace_score – Receive a MSG_TRACE_SCORE datagram from the server.
+ * Respects SO_RCVTIMEO.
+ *
+ * @return 1 on success, 0 on failure or timeout.
+ */
+int ipc_client_recv_trace_score(ipc_client_t *client, struct trace_score_msg *score);
+
+/**
+ * ipc_client_send_dl_reward – Transmit a MSG_DL_REWARD datagram to the server.
+ * Uses MSG_NOSIGNAL to prevent SIGPIPE.
+ *
+ * @return 1 on success, 0 on failure.
+ */
+int ipc_client_send_dl_reward(ipc_client_t *client, const struct dl_reward_msg *reward);
+
+/**
  * ipc_client_close – Close socket connection and free client resources.
  */
 void ipc_client_close(ipc_client_t *client);

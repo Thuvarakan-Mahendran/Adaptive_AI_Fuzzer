@@ -202,6 +202,57 @@ int ipc_client_recv_seed_verd(ipc_client_t *client, struct seed_verdict_msg *ver
     return 1;
 }
 
+int ipc_client_send_trace_submit(ipc_client_t *client, const struct trace_submit_msg *msg)
+{
+    if (!client || !client->connected || client->sock_fd < 0 || !msg)
+        return 0;
+
+    ssize_t sent = send(client->sock_fd, msg, sizeof(*msg), MSG_NOSIGNAL);
+    if (sent != (ssize_t)sizeof(*msg)) {
+        if (sent < 0 && (errno == EPIPE || errno == ECONNRESET || errno == ENOTCONN)) {
+            handle_transport_error(client);
+        }
+        return 0;
+    }
+
+    return 1;
+}
+
+int ipc_client_recv_trace_score(ipc_client_t *client, struct trace_score_msg *score)
+{
+    if (!client || !client->connected || client->sock_fd < 0 || !score)
+        return 0;
+
+    ssize_t recvd = recv(client->sock_fd, score, sizeof(*score), 0);
+    if (recvd <= 0) {
+        if (recvd == 0 || (recvd < 0 && (errno == ECONNRESET || errno == ENOTCONN))) {
+            handle_transport_error(client);
+        }
+        return 0;
+    }
+
+    if (recvd != (ssize_t)sizeof(*score) || score->type != MSG_TRACE_SCORE)
+        return 0;
+
+    return 1;
+}
+
+int ipc_client_send_dl_reward(ipc_client_t *client, const struct dl_reward_msg *reward)
+{
+    if (!client || !client->connected || client->sock_fd < 0 || !reward)
+        return 0;
+
+    ssize_t sent = send(client->sock_fd, reward, sizeof(*reward), MSG_NOSIGNAL);
+    if (sent != (ssize_t)sizeof(*reward)) {
+        if (sent < 0 && (errno == EPIPE || errno == ECONNRESET || errno == ENOTCONN)) {
+            handle_transport_error(client);
+        }
+        return 0;
+    }
+
+    return 1;
+}
+
 void ipc_client_close(ipc_client_t *client)
 {
     if (!client)

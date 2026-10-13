@@ -15,6 +15,7 @@
 #include "aggregator.h"
 #include "operators.h"
 #include "socket_client.h"
+#include "trace_collector.h"
 
 /* Maximum frame size passed to the mutator.
  * Set to 256 to match the Modbus RTU frame cap used in this project.
@@ -32,7 +33,9 @@
 typedef struct {
     afl_state_t   *afl;         /* Pointer to live AFL++ state (not owned)   */
     aggregator_t   agg;         /* Feedback aggregator (snapshot + history)  */
-    ipc_client_t  *ipc;         /* Decoupled IPC client handle               */
+    ipc_client_t  *ipc;         /* Decoupled IPC client handle for PPO       */
+    ipc_client_t  *dl_ipc;      /* Decoupled IPC client handle for DL daemon */
+    trace_buffer_t trace_buf;   /* Buffer for storing execution traces       */
 
     uint8_t       *out_buf;     /* Heap buffer for the mutated output frame  */
     size_t         max_size;    /* Hard cap on output size (MUTATOR_MAX_SIZE)*/

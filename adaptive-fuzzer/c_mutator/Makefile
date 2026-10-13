@@ -23,7 +23,7 @@ CFLAGS  := -O3 -fPIC -Wall -Wextra \
 LDFLAGS := -shared -lm
 
 # Source files for the shared library
-LIB_SRCS := aggregator.c operators.c mutator.c
+LIB_SRCS := aggregator.c operators.c trace_collector.c mutator.c
 LIB_OBJS := $(LIB_SRCS:.c=.o)
 IPC_OBJ  := $(IPC_DIR)/client_c/socket_client.o
 
@@ -51,7 +51,10 @@ aggregator.o: aggregator.c aggregator.h protocol.h $(IPC_DIR)/common/protocol.h
 operators.o: operators.c operators.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-mutator.o: mutator.c mutator.h protocol.h aggregator.h operators.h $(IPC_DIR)/client_c/socket_client.h
+trace_collector.o: trace_collector.c trace_collector.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+mutator.o: mutator.c mutator.h protocol.h aggregator.h operators.h trace_collector.h $(IPC_DIR)/client_c/socket_client.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # -----------------------------------------------------------------------------

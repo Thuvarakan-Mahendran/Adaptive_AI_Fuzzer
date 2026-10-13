@@ -53,6 +53,18 @@ static void replenish_action_queue(mutator_state_t *state)
     /* Compute deferred reward from previous execution */
     float r_deferred = agg_compute_reward(&state->agg, &snap);
 
+    /* Send real-time reward feedback to DL daemon if connected */
+    if (state->dl_ipc && ipc_client_is_connected(state->dl_ipc)) {
+        struct dl_reward_msg dl_rew;
+        memset(&dl_rew, 0, sizeof(dl_rew));
+        dl_rew.type        = MSG_DL_REWARD;
+        dl_rew.seed_id     = state->agg.prev_entry;
+        dl_rew.delta_edges = 0;
+        dl_rew.found_crash = (snap.saved_crashes > state->agg.prev_crashes) ? 1 : 0;
+        dl_rew.total_execs = (uint32_t)state->agg.total_execs;
+        ipc_client_send_dl_reward(state->dl_ipc, &dl_rew);
+    }
+
     /* Assemble the request message */
     struct mut_request_msg req;
     memset(&req, 0, sizeof(req));
@@ -110,12 +122,24 @@ mutator_state_t *afl_custom_init(afl_state_t *afl, unsigned int seed)
 
     agg_init(&state->agg);
 
-    /* Initialize decoupled IPC client (100ms timeout, 5 retries) */
+    /* Initialize trace collector */
+    trace_collector_init();
+    trace_begin(&state->trace_buf, 0);
+
+    /* Initialize decoupled IPC client (100ms timeout, 5 retries) for PPO */
     state->ipc = ipc_client_init(DEFAULT_SOCKET_PATH, 100, 5);
     if (!ipc_client_is_connected(state->ipc)) {
-        fprintf(stderr, "[mutator] daemon not found — running in fallback mode\n");
+        fprintf(stderr, "[mutator] ppo daemon not found — running in fallback mode\n");
     } else {
-        fprintf(stderr, "[mutator] connected to daemon at %s\n", DEFAULT_SOCKET_PATH);
+        fprintf(stderr, "[mutator] connected to ppo daemon at %s\n", DEFAULT_SOCKET_PATH);
+    }
+
+    /* Initialize decoupled IPC client for DL seed prioritization daemon */
+    state->dl_ipc = ipc_client_init(DL_SOCKET_PATH, 100, 5);
+    if (!ipc_client_is_connected(state->dl_ipc)) {
+        fprintf(stderr, "[mutator] dl daemon not found — running in fallback mode\n");
+    } else {
+        fprintf(stderr, "[mutator] connected to dl daemon at %s\n", DL_SOCKET_PATH);
     }
 
     /* Initialise action cache as empty so the first fuzz call triggers replenishment */
@@ -129,30 +153,65 @@ mutator_state_t *afl_custom_init(afl_state_t *afl, unsigned int seed)
  * afl_custom_queue_get – Seed prioritization hook.
  *
  * Called by AFL++ when it is about to switch to a new queue entry.
- * Sends a MSG_SEED_QUERY via ipc_client and returns accept/skip verdict.
+ * First queries the DL seed prioritization daemon (MSG_TRACE_SUBMIT).
+ * Falls back to PPO MSG_SEED_QUERY or accept=1 if disconnected.
  */
 uint8_t afl_custom_queue_get(mutator_state_t *data, const uint8_t *filename)
 {
     (void)filename;   /* Not used; seed is identified by queue index */
 
-    if (!data || !ipc_client_is_connected(data->ipc))
-        return 1;   /* Accept by default in fallback mode */
+    if (!data)
+        return 1;
 
-    struct seed_query_msg query;
-    memset(&query, 0, sizeof(query));
-    query.type      = MSG_SEED_QUERY;
-    query.seed_id   = data->afl->current_entry;
-    query.trace_len = 1;
-    query.steps[0].edge_id       = 0x0001;
-    query.steps[0].hit_count_bin = 1;
-    query.steps[0].fault_flags   = 0;
+    /* 1. Primary: DL Seed Prioritization Daemon */
+    if (ipc_client_is_connected(data->dl_ipc)) {
+        uint32_t seed_id = data->afl->current_entry;
 
-    struct seed_verdict_msg verd;
-    memset(&verd, 0, sizeof(verd));
+        trace_begin(&data->trace_buf, seed_id);
 
-    if (ipc_client_send_seed_query(data->ipc, &query) &&
-        ipc_client_recv_seed_verd(data->ipc, &verd)) {
-        return verd.accept;
+        if (data->afl->fsrv.trace_bits) {
+            size_t map_sz = data->afl->fsrv.map_size
+                            ? (size_t)data->afl->fsrv.map_size
+                            : AFL_BITMAP_BYTES;
+            trace_extract_from_bitmap(&data->trace_buf, data->afl->fsrv.trace_bits, map_sz);
+        }
+
+        char trace_path[TRACE_PATH_MAX];
+        if (trace_flush(&data->trace_buf, trace_path, sizeof(trace_path))) {
+            struct trace_submit_msg sub_msg;
+            memset(&sub_msg, 0, sizeof(sub_msg));
+            sub_msg.type    = MSG_TRACE_SUBMIT;
+            sub_msg.seed_id = seed_id;
+            strncpy(sub_msg.trace_path, trace_path, sizeof(sub_msg.trace_path) - 1);
+
+            struct trace_score_msg score_msg;
+            memset(&score_msg, 0, sizeof(score_msg));
+
+            if (ipc_client_send_trace_submit(data->dl_ipc, &sub_msg) &&
+                ipc_client_recv_trace_score(data->dl_ipc, &score_msg)) {
+                return score_msg.accept;
+            }
+        }
+    }
+
+    /* 2. Fallback: Legacy MSG_SEED_QUERY via PPO IPC client */
+    if (ipc_client_is_connected(data->ipc)) {
+        struct seed_query_msg query;
+        memset(&query, 0, sizeof(query));
+        query.type      = MSG_SEED_QUERY;
+        query.seed_id   = data->afl->current_entry;
+        query.trace_len = 1;
+        query.steps[0].edge_id       = 0x0001;
+        query.steps[0].hit_count_bin = 1;
+        query.steps[0].fault_flags   = 0;
+
+        struct seed_verdict_msg verd;
+        memset(&verd, 0, sizeof(verd));
+
+        if (ipc_client_send_seed_query(data->ipc, &query) &&
+            ipc_client_recv_seed_verd(data->ipc, &verd)) {
+            return verd.accept;
+        }
     }
 
     return 1;   /* Accept on malformed/timeout response */
@@ -208,6 +267,9 @@ void afl_custom_deinit(mutator_state_t *data)
         return;
     if (data->ipc)
         ipc_client_close(data->ipc);
+    if (data->dl_ipc)
+        ipc_client_close(data->dl_ipc);
+    trace_free(&data->trace_buf);
     free(data->out_buf);
     free(data);
 }

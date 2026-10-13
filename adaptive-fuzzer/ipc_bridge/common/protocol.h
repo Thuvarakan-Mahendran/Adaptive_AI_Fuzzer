@@ -24,6 +24,8 @@
  * Socket path
  * ------------------------------------------------------------------------- */
 #define DEFAULT_SOCKET_PATH "/tmp/afl_ai_bridge.sock"
+#define DL_SOCKET_PATH      "/tmp/afl_dl_bridge.sock"
+#define TRACE_PATH_MAX      256
 
 /* Maximum batch size for operator scheduling */
 #define MUT_BATCH_MAX  32
@@ -35,10 +37,13 @@
  * Message type tag (first byte of every message)
  * ------------------------------------------------------------------------- */
 typedef enum {
-    MSG_MUT_REQ    = 0x01,   /* C → Python: PPO state + deferred reward   */
-    MSG_MUT_RESP   = 0x02,   /* Python → C: scheduled operator ID batch   */
-    MSG_SEED_QUERY = 0x03,   /* C → Python: execution trace for DL scorer */
-    MSG_SEED_VERD  = 0x04    /* Python → C: seed prioritization verdict   */
+    MSG_MUT_REQ      = 0x01,   /* C → Python: PPO state + deferred reward   */
+    MSG_MUT_RESP     = 0x02,   /* Python → C: scheduled operator ID batch   */
+    MSG_SEED_QUERY   = 0x03,   /* C → Python: execution trace for DL scorer */
+    MSG_SEED_VERD    = 0x04,   /* Python → C: seed prioritization verdict   */
+    MSG_TRACE_SUBMIT = 0x05,   /* C → Python: seed_id + trace path          */
+    MSG_TRACE_SCORE  = 0x06,   /* Python → C: Q-value + accept verdict      */
+    MSG_DL_REWARD    = 0x07    /* C → Python: seed outcome reward feedback  */
 } msg_type_t;
 
 /* -------------------------------------------------------------------------
@@ -75,6 +80,46 @@ struct seed_verdict_msg {
     uint8_t  type;      /* MSG_SEED_VERD (0x04)                              */
     float    q_value;   /* Estimated long-term utility Q(s,a); for logging   */
     uint8_t  accept;    /* 1 = proceed with fuzzing; 0 = skip/deprioritize   */
+} __attribute__((packed));
+
+/* -------------------------------------------------------------------------
+ * MSG_TRACE_SUBMIT – C → Python
+ *
+ * Sent by mutator/trace collector to notify the Python DL daemon of a
+ * newly generated variable-length trace stored in /dev/shm.
+ * Total size: 1 + 4 + 256 = 261 bytes.
+ * ------------------------------------------------------------------------- */
+struct trace_submit_msg {
+    uint8_t  type;                        /* MSG_TRACE_SUBMIT (0x05)         */
+    uint32_t seed_id;                     /* Monotonic queue ID / entry idx  */
+    char     trace_path[TRACE_PATH_MAX];  /* Path to trace file in /dev/shm */
+} __attribute__((packed));
+
+/* -------------------------------------------------------------------------
+ * MSG_TRACE_SCORE – Python → C
+ *
+ * Python DL daemon responds with an estimated Q-value and accept/skip verdict.
+ * Total size: 1 + 4 + 1 = 6 bytes.
+ * ------------------------------------------------------------------------- */
+struct trace_score_msg {
+    uint8_t  type;      /* MSG_TRACE_SCORE (0x06)                            */
+    float    q_value;   /* Estimated Q(seed) utility for queue ranking       */
+    uint8_t  accept;    /* 1 = proceed with fuzzing; 0 = skip/deprioritize   */
+} __attribute__((packed));
+
+/* -------------------------------------------------------------------------
+ * MSG_DL_REWARD – C → Python
+ *
+ * Sent after fuzzing a seed finishes to provide real-time feedback
+ * directly into the DL replay buffer.
+ * Total size: 1 + 4 + 4 + 1 + 4 = 14 bytes.
+ * ------------------------------------------------------------------------- */
+struct dl_reward_msg {
+    uint8_t  type;           /* MSG_DL_REWARD (0x07)                        */
+    uint32_t seed_id;        /* Seed queue index that was fuzzed            */
+    uint32_t delta_edges;    /* New coverage bitmap edges discovered        */
+    uint8_t  found_crash;    /* 1 if new crash observed, else 0             */
+    uint32_t total_execs;    /* Cumulative campaign executions counter      */
 } __attribute__((packed));
 
 /* -------------------------------------------------------------------------

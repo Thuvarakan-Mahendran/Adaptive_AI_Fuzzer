@@ -21,14 +21,19 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 # Protocol constants
 # ---------------------------------------------------------------------------
 DEFAULT_SOCKET_PATH = "/tmp/afl_ai_bridge.sock"
+DL_SOCKET_PATH      = "/tmp/afl_dl_bridge.sock"
 
-MSG_MUT_REQ    = 0x01
-MSG_MUT_RESP   = 0x02
-MSG_SEED_QUERY = 0x03
-MSG_SEED_VERD  = 0x04
+MSG_MUT_REQ      = 0x01
+MSG_MUT_RESP     = 0x02
+MSG_SEED_QUERY   = 0x03
+MSG_SEED_VERD    = 0x04
+MSG_TRACE_SUBMIT = 0x05
+MSG_TRACE_SCORE  = 0x06
+MSG_DL_REWARD    = 0x07
 
 MUT_BATCH_MAX   = 32
 TRACE_STEPS_MAX = 512
+TRACE_PATH_MAX  = 256
 TOTAL_OPERATORS = 14
 
 # Struct formats (little-endian native __attribute__((packed)))
@@ -47,6 +52,15 @@ SEED_QUERY_SIZE        = struct.calcsize(SEED_QUERY_FMT)        # 2057 bytes
 
 SEED_VERD_FMT  = "<B f B"
 SEED_VERD_SIZE = struct.calcsize(SEED_VERD_FMT) # 6 bytes
+
+TRACE_SUBMIT_FMT  = f"<B I {TRACE_PATH_MAX}s"
+TRACE_SUBMIT_SIZE = struct.calcsize(TRACE_SUBMIT_FMT) # 261 bytes
+
+TRACE_SCORE_FMT  = "<B f B"
+TRACE_SCORE_SIZE = struct.calcsize(TRACE_SCORE_FMT)   # 6 bytes
+
+DL_REWARD_FMT  = "<B I I B I"
+DL_REWARD_SIZE = struct.calcsize(DL_REWARD_FMT)       # 14 bytes
 
 logger = logging.getLogger("ipc_bridge.server")
 
@@ -113,6 +127,73 @@ def unpack_seed_query(data: bytes) -> Dict[str, Any]:
 def pack_seed_verd(q_value: float, accept: int) -> bytes:
     """Pack seed verdict into a 6-byte MSG_SEED_VERD datagram."""
     return struct.pack(SEED_VERD_FMT, MSG_SEED_VERD, float(q_value), int(accept))
+
+
+def unpack_trace_submit(data: bytes) -> Dict[str, Any]:
+    """Unpack raw binary payload into a structured MSG_TRACE_SUBMIT dictionary."""
+    if len(data) < TRACE_SUBMIT_SIZE:
+        raise ValueError(f"Payload too short for MSG_TRACE_SUBMIT: {len(data)} < {TRACE_SUBMIT_SIZE}")
+
+    msg_type, seed_id, trace_path_raw = struct.unpack_from(TRACE_SUBMIT_FMT, data)
+    trace_path = trace_path_raw.split(b"\x00", 1)[0].decode("utf-8", errors="replace")
+
+    return {
+        "msg_type": msg_type,
+        "seed_id": int(seed_id),
+        "trace_path": trace_path,
+    }
+
+
+def pack_trace_submit(seed_id: int, trace_path: str) -> bytes:
+    """Pack trace file notification into a 261-byte MSG_TRACE_SUBMIT datagram."""
+    path_bytes = trace_path.encode("utf-8")[:TRACE_PATH_MAX]
+    path_bytes_padded = path_bytes.ljust(TRACE_PATH_MAX, b"\x00")
+    return struct.pack(TRACE_SUBMIT_FMT, MSG_TRACE_SUBMIT, int(seed_id), path_bytes_padded)
+
+
+def unpack_trace_score(data: bytes) -> Dict[str, Any]:
+    """Unpack raw binary payload into a structured MSG_TRACE_SCORE dictionary."""
+    if len(data) < TRACE_SCORE_SIZE:
+        raise ValueError(f"Payload too short for MSG_TRACE_SCORE: {len(data)} < {TRACE_SCORE_SIZE}")
+
+    msg_type, q_value, accept = struct.unpack_from(TRACE_SCORE_FMT, data)
+    return {
+        "msg_type": msg_type,
+        "q_value": float(q_value),
+        "accept": int(accept),
+    }
+
+
+def pack_trace_score(q_value: float, accept: int) -> bytes:
+    """Pack score verdict into a 6-byte MSG_TRACE_SCORE datagram."""
+    return struct.pack(TRACE_SCORE_FMT, MSG_TRACE_SCORE, float(q_value), int(accept))
+
+
+def unpack_dl_reward(data: bytes) -> Dict[str, Any]:
+    """Unpack raw binary payload into a structured MSG_DL_REWARD dictionary."""
+    if len(data) < DL_REWARD_SIZE:
+        raise ValueError(f"Payload too short for MSG_DL_REWARD: {len(data)} < {DL_REWARD_SIZE}")
+
+    msg_type, seed_id, delta_edges, found_crash, total_execs = struct.unpack_from(DL_REWARD_FMT, data)
+    return {
+        "msg_type": msg_type,
+        "seed_id": int(seed_id),
+        "delta_edges": int(delta_edges),
+        "found_crash": int(found_crash),
+        "total_execs": int(total_execs),
+    }
+
+
+def pack_dl_reward(seed_id: int, delta_edges: int, found_crash: int, total_execs: int) -> bytes:
+    """Pack seed fuzzing outcome into a 14-byte MSG_DL_REWARD datagram."""
+    return struct.pack(
+        DL_REWARD_FMT,
+        MSG_DL_REWARD,
+        int(seed_id),
+        int(delta_edges),
+        int(found_crash),
+        int(total_execs),
+    )
 
 
 # ---------------------------------------------------------------------------
